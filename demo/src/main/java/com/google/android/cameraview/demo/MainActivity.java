@@ -22,6 +22,7 @@ import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -102,10 +103,25 @@ public class MainActivity extends AppCompatActivity implements
                 case R.id.take_picture:
                     if (mCameraView != null) {
                         mTakingPictureFab.hide();
-                        mTalkingToUser.setText("Taking picture");
-                        mCameraView.takePicture();
-                        mTalkingToUser.setText("");
-                        mTakingPictureFab.show();
+                        new CountDownTimer(5000, 1000) {
+
+                            @Override
+                            public void onTick(long l) {
+                                long leftSeconds = l / 1000;
+                                if (leftSeconds > 0) {
+                                    mTalkingToUser.setText(String.valueOf(leftSeconds));
+                                } else {
+                                    mTalkingToUser.setText("Cheeeese!");
+                                }
+                            }
+
+                            @Override
+                            public void onFinish() {
+                                //mCameraView.takePicture();
+                                mTalkingToUser.setText("");
+                                mTakingPictureFab.show();
+                            }
+                        }.start();
                     }
                     break;
             }
