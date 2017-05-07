@@ -40,6 +40,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.cameraview.AspectRatio;
@@ -90,13 +91,21 @@ public class MainActivity extends AppCompatActivity implements
 
     private Handler mBackgroundHandler;
 
+    private TextView mTalkingToUser;
+
+    private FloatingActionButton mTakingPictureFab;
+
     private View.OnClickListener mOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.take_picture:
                     if (mCameraView != null) {
+                        mTakingPictureFab.hide();
+                        mTalkingToUser.setText("Taking picture");
                         mCameraView.takePicture();
+                        mTalkingToUser.setText("");
+                        mTakingPictureFab.show();
                     }
                     break;
             }
@@ -111,9 +120,10 @@ public class MainActivity extends AppCompatActivity implements
         if (mCameraView != null) {
             mCameraView.addCallback(mCallback);
         }
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.take_picture);
-        if (fab != null) {
-            fab.setOnClickListener(mOnClickListener);
+        mTalkingToUser = (TextView) findViewById(R.id.talkingToUser);
+        mTakingPictureFab = (FloatingActionButton) findViewById(R.id.take_picture);
+        if (mTakingPictureFab != null) {
+            mTakingPictureFab.setOnClickListener(mOnClickListener);
         }
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
