@@ -660,6 +660,7 @@ class Camera2 extends CameraViewImpl {
                     } catch (CameraAccessException e) {
                         Log.e(TAG, "Cannot stop capturing pictures.", e);
                     }
+                    unlockFocus();
                     mCallback.onAllPicturesTaken();
                 }
             }.start();

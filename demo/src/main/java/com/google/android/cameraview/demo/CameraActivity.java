@@ -60,7 +60,6 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Set;
 
-
 /**
  * This demo app saves the taken picture to a constant file.
  * $ adb pull /sdcard/Android/data/com.google.android.cameraview.demo/files/Pictures/picture.jpg
