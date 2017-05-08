@@ -55,6 +55,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 import java.util.Set;
 
 
@@ -62,11 +65,11 @@ import java.util.Set;
  * This demo app saves the taken picture to a constant file.
  * $ adb pull /sdcard/Android/data/com.google.android.cameraview.demo/files/Pictures/picture.jpg
  */
-public class MainActivity extends AppCompatActivity implements
+public class CameraActivity extends AppCompatActivity implements
     ActivityCompat.OnRequestPermissionsResultCallback,
     AspectRatioFragment.Listener {
 
-  private static final String TAG = "MainActivity";
+  private static final String TAG = "CameraActivity";
 
   private static final int REQUEST_CAMERA_PERMISSION = 1;
 
@@ -107,23 +110,19 @@ public class MainActivity extends AppCompatActivity implements
         case R.id.take_picture:
           if (mCameraView != null) {
             mTakingPictureFab.hide();
-            new CountDownTimer(4020, 1000) {
+            mPictureSessionFolder = new SimpleDateFormat("yyyyMMdd-HHmmss", Locale.FRANCE).format(new Date());
+            new CountDownTimer(4000, 1000) {
 
               @Override
               public void onTick(long l) {
                 long leftSeconds = l / 1000;
-                if (leftSeconds > 0) {
-                  mTalkingToUser.setText(String.valueOf(leftSeconds));
-                } else {
-                  mTalkingToUser.setText("Cheeeese!");
-                }
+                mTalkingToUser.setText(String.valueOf(leftSeconds));
               }
 
               @Override
               public void onFinish() {
+                mTalkingToUser.setText("Cheeeese!");
                 mCameraView.takePicture();
-                mTalkingToUser.setText("");
-                mTakingPictureFab.show();
               }
             }.start();
           }
@@ -131,6 +130,7 @@ public class MainActivity extends AppCompatActivity implements
       }
     }
   };
+  private String mPictureSessionFolder;
   private CameraView.Callback mCallback
       = new CameraView.Callback() {
 
@@ -152,7 +152,10 @@ public class MainActivity extends AppCompatActivity implements
       getBackgroundHandler().post(new Runnable() {
         @Override
         public void run() {
-          File file = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES),
+          File externalFilesDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+          File pictureSessionDir = new File(externalFilesDir, mPictureSessionFolder);
+          pictureSessionDir.mkdir();
+          File file = new File(pictureSessionDir,
               "picture-" + System.currentTimeMillis() + ".jpg");
           Log.d(TAG, "Saving to " + file.getAbsolutePath());
           OutputStream os = null;
@@ -175,6 +178,11 @@ public class MainActivity extends AppCompatActivity implements
       });
     }
 
+    @Override
+    public void onAllPicturesTaken() {
+      mTalkingToUser.setText("Processing gif");
+      createGif(mPictureSessionFolder);
+    }
   };
 
   @Override
@@ -274,15 +282,12 @@ public class MainActivity extends AppCompatActivity implements
         }
         return true;
       case R.id.switch_flash:
-                /*
-                if (mCameraView != null) {
-                    mCurrentFlash = (mCurrentFlash + 1) % FLASH_OPTIONS.length;
-                    item.setTitle(FLASH_TITLES[mCurrentFlash]);
-                    item.setIcon(FLASH_ICONS[mCurrentFlash]);
-                    mCameraView.setFlash(FLASH_OPTIONS[mCurrentFlash]);
-                }
-                */
-        createGif();
+        if (mCameraView != null) {
+          mCurrentFlash = (mCurrentFlash + 1) % FLASH_OPTIONS.length;
+          item.setTitle(FLASH_TITLES[mCurrentFlash]);
+          item.setIcon(FLASH_ICONS[mCurrentFlash]);
+          mCameraView.setFlash(FLASH_OPTIONS[mCurrentFlash]);
+        }
         return true;
       case R.id.switch_camera:
         if (mCameraView != null) {
@@ -312,35 +317,38 @@ public class MainActivity extends AppCompatActivity implements
     return mBackgroundHandler;
   }
 
-  private void createGif() {
+  private void createGif(final String pictureSessionFolder) {
     getBackgroundHandler().post(new Runnable() {
       @Override
       public void run() {
-        File takenPictures = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File file = new File(takenPictures,
+        File pictureSessionDir = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), pictureSessionFolder);
+        if (!pictureSessionDir.isDirectory()) {
+          return;
+        }
+        File gifFile = new File(pictureSessionDir,
             "gif-" + System.currentTimeMillis() + ".gif");
         OutputStream os = null;
         ByteArrayOutputStream bos = null;
         try {
-          AnimatedGifEncoder encoder = new AnimatedGifEncoder();
+          AnimatedGifEncoder gifEncoder = new AnimatedGifEncoder();
           bos = new ByteArrayOutputStream();
-          encoder.setDelay(300);
-          encoder.start(bos);
-          for (File nextPic : takenPictures.listFiles()) {
+          gifEncoder.setDelay(300);
+          gifEncoder.start(bos);
+          for (File nextPic : pictureSessionDir.listFiles()) {
             if (nextPic.getName().startsWith("picture-")) {
               Log.d(TAG, "adding frame for pic " + nextPic.getName());
-              encoder.addFrame(nextBitmap(nextPic));
+              gifEncoder.addFrame(bitmapOf(nextPic));
             }
           }
-          encoder.finish();
+          gifEncoder.finish();
 
-          os = new FileOutputStream(file);
+          os = new FileOutputStream(gifFile);
           os.write(bos.toByteArray());
           os.close();
           bos.close();
-          Log.d(TAG, "Saved gif to " + file.getAbsolutePath());
+          Log.d(TAG, "Saved gif to " + gifFile.getAbsolutePath());
         } catch (IOException e) {
-          Log.w(TAG, "Cannot write to " + file, e);
+          Log.w(TAG, "Cannot write to " + gifFile, e);
         } finally {
           if (os != null) {
             try {
@@ -361,7 +369,7 @@ public class MainActivity extends AppCompatActivity implements
     });
   }
 
-  private Bitmap nextBitmap(File nextPicPath) {
+  private Bitmap bitmapOf(File nextPicPath) {
     BitmapFactory.Options options = new BitmapFactory.Options();
     options.inPreferredConfig = Bitmap.Config.ARGB_8888;
     Bitmap bitmap = BitmapFactory.decodeFile(nextPicPath.getAbsolutePath(), options);

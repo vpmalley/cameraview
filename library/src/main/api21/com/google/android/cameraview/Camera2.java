@@ -147,7 +147,7 @@ class Camera2 extends CameraViewImpl {
 
         @Override
         public void onReady() {
-            captureStillPicture();
+            captureBunchOfPictures();
         }
 
     };
@@ -338,7 +338,7 @@ class Camera2 extends CameraViewImpl {
         if (mAutoFocus) {
             lockFocus();
         } else {
-            captureStillPicture();
+            captureBunchOfPictures();
         }
     }
 
@@ -592,9 +592,9 @@ class Camera2 extends CameraViewImpl {
     }
 
     /**
-     * Captures a still picture.
+     * Captures a bunch of pictures for a couple seconds.
      */
-    void captureStillPicture() {
+    void captureBunchOfPictures() {
         try {
             CaptureRequest.Builder captureRequestBuilder = mCamera.createCaptureRequest(
                     CameraDevice.TEMPLATE_STILL_CAPTURE);
@@ -647,11 +647,10 @@ class Camera2 extends CameraViewImpl {
                             unlockFocus();
                         }
                     }, null);
-            new CountDownTimer(4000, 100) {
+            new CountDownTimer(6000, 1000) {
 
                 @Override
                 public void onTick(long l) {
-
                 }
 
                 @Override
@@ -661,6 +660,7 @@ class Camera2 extends CameraViewImpl {
                     } catch (CameraAccessException e) {
                         Log.e(TAG, "Cannot stop capturing pictures.", e);
                     }
+                    mCallback.onAllPicturesTaken();
                 }
             }.start();
         } catch (CameraAccessException e) {

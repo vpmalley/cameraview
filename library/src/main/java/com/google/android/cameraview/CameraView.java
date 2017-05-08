@@ -449,6 +449,13 @@ public class CameraView extends FrameLayout {
             }
         }
 
+        @Override
+        public void onAllPicturesTaken() {
+            for (Callback callback : mCallbacks) {
+                callback.onAllPicturesTaken();
+            }
+        }
+
         public void reserveRequestLayoutOnOpen() {
             mRequestLayoutOnOpen = true;
         }
@@ -530,10 +537,17 @@ public class CameraView extends FrameLayout {
         /**
          * Called when a picture is taken.
          *
-         * @param cameraView The associated {@link CameraView}.
-         * @param data       JPEG data.
+         * @param cameraView            The associated {@link CameraView}.
+         * @param data                  JPEG data.
          */
         public void onPictureTaken(CameraView cameraView, byte[] data) {
+        }
+
+        /**
+         * Called when all pictures have been taken.
+         *
+         */
+        public void onAllPicturesTaken() {
         }
     }
 
