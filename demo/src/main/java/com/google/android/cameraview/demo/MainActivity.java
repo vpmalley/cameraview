@@ -20,6 +20,8 @@ import android.Manifest;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -46,7 +48,9 @@ import android.widget.Toast;
 
 import com.google.android.cameraview.AspectRatio;
 import com.google.android.cameraview.CameraView;
+import com.nbadal.gifencoder.AnimatedGifEncoder;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -190,7 +194,7 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-            @NonNull int[] grantResults) {
+                                           @NonNull int[] grantResults) {
         switch (requestCode) {
             case REQUEST_CAMERA_PERMISSION:
                 if (permissions.length != 1 || grantResults.length != 1) {
@@ -225,12 +229,15 @@ public class MainActivity extends AppCompatActivity implements
                 }
                 return true;
             case R.id.switch_flash:
+                /*
                 if (mCameraView != null) {
                     mCurrentFlash = (mCurrentFlash + 1) % FLASH_OPTIONS.length;
                     item.setTitle(FLASH_TITLES[mCurrentFlash]);
                     item.setIcon(FLASH_ICONS[mCurrentFlash]);
                     mCameraView.setFlash(FLASH_OPTIONS[mCurrentFlash]);
                 }
+                */
+                createGif();
                 return true;
             case R.id.switch_camera:
                 if (mCameraView != null) {
@@ -306,6 +313,63 @@ public class MainActivity extends AppCompatActivity implements
 
     };
 
+    private void createGif() {
+        getBackgroundHandler().post(new Runnable() {
+            @Override
+            public void run() {
+                File takenPictures = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+                File file = new File(takenPictures,
+                        "gif-" + System.currentTimeMillis() + ".gif");
+                OutputStream os = null;
+                ByteArrayOutputStream bos = null;
+                try {
+                    AnimatedGifEncoder encoder = new AnimatedGifEncoder();
+                    bos = new ByteArrayOutputStream();
+                    encoder.setDelay(300);
+                    encoder.start(bos);
+                    for (File nextPic: takenPictures.listFiles()) {
+                        if (nextPic.getName().startsWith("picture-")) {
+                            Log.d(TAG, "adding frame for pic " + nextPic.getName());
+                            encoder.addFrame(nextBitmap(nextPic));
+                        }
+                    }
+                    encoder.finish();
+
+
+                    os = new FileOutputStream(file);
+                    os.write(bos.toByteArray());
+                    os.close();
+                    bos.close();
+                    Log.d(TAG, "Saved gif to " + file.getAbsolutePath());
+                } catch (IOException e) {
+                    Log.w(TAG, "Cannot write to " + file, e);
+                } finally {
+                    if (os != null) {
+                        try {
+                            os.close();
+                        } catch (IOException e) {
+                            // Ignore
+                        }
+                    }
+                }
+                if (bos != null) {
+                    try {
+                        bos.close();
+                    } catch (IOException e) {
+                        // Ignore
+                    }
+                }
+            }
+        });
+    }
+
+    private Bitmap nextBitmap(File nextPicPath) {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+        Bitmap bitmap = BitmapFactory.decodeFile(nextPicPath.getAbsolutePath(), options);
+        return bitmap;
+    }
+
     public static class ConfirmationDialogFragment extends DialogFragment {
 
         private static final String ARG_MESSAGE = "message";
@@ -314,7 +378,7 @@ public class MainActivity extends AppCompatActivity implements
         private static final String ARG_NOT_GRANTED_MESSAGE = "not_granted_message";
 
         public static ConfirmationDialogFragment newInstance(@StringRes int message,
-                String[] permissions, int requestCode, @StringRes int notGrantedMessage) {
+                                                             String[] permissions, int requestCode, @StringRes int notGrantedMessage) {
             ConfirmationDialogFragment fragment = new ConfirmationDialogFragment();
             Bundle args = new Bundle();
             args.putInt(ARG_MESSAGE, message);
