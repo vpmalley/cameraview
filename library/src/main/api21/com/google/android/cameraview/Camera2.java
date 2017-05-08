@@ -30,6 +30,7 @@ import android.hardware.camera2.TotalCaptureResult;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.Image;
 import android.media.ImageReader;
+import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.util.SparseIntArray;
@@ -636,7 +637,8 @@ class Camera2 extends CameraViewImpl {
                             360) % 360);
             // Stop preview and capture a still picture.
             mCaptureSession.stopRepeating();
-            mCaptureSession.capture(captureRequestBuilder.build(),
+            Log.d(TAG, "Start capturing");
+            mCaptureSession.setRepeatingRequest(captureRequestBuilder.build(),
                     new CameraCaptureSession.CaptureCallback() {
                         @Override
                         public void onCaptureCompleted(@NonNull CameraCaptureSession session,
@@ -645,6 +647,22 @@ class Camera2 extends CameraViewImpl {
                             unlockFocus();
                         }
                     }, null);
+            new CountDownTimer(4000, 100) {
+
+                @Override
+                public void onTick(long l) {
+
+                }
+
+                @Override
+                public void onFinish() {
+                    try {
+                        mCaptureSession.stopRepeating();
+                    } catch (CameraAccessException e) {
+                        Log.e(TAG, "Cannot stop capturing pictures.", e);
+                    }
+                }
+            }.start();
         } catch (CameraAccessException e) {
             Log.e(TAG, "Cannot capture a still picture.", e);
         }

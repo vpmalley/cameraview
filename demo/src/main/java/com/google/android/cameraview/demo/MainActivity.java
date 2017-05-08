@@ -103,7 +103,7 @@ public class MainActivity extends AppCompatActivity implements
                 case R.id.take_picture:
                     if (mCameraView != null) {
                         mTakingPictureFab.hide();
-                        new CountDownTimer(5000, 1000) {
+                        new CountDownTimer(4020, 1000) {
 
                             @Override
                             public void onTick(long l) {
@@ -117,7 +117,7 @@ public class MainActivity extends AppCompatActivity implements
 
                             @Override
                             public void onFinish() {
-                                //mCameraView.takePicture();
+                                mCameraView.takePicture();
                                 mTalkingToUser.setText("");
                                 mTakingPictureFab.show();
                             }
@@ -282,7 +282,8 @@ public class MainActivity extends AppCompatActivity implements
                 @Override
                 public void run() {
                     File file = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES),
-                            "picture.jpg");
+                            "picture-" + System.currentTimeMillis() + ".jpg");
+                    Log.d(TAG, "Saving to " + file.getAbsolutePath());
                     OutputStream os = null;
                     try {
                         os = new FileOutputStream(file);
