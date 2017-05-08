@@ -63,172 +63,217 @@ import java.util.Set;
  * $ adb pull /sdcard/Android/data/com.google.android.cameraview.demo/files/Pictures/picture.jpg
  */
 public class MainActivity extends AppCompatActivity implements
-        ActivityCompat.OnRequestPermissionsResultCallback,
-        AspectRatioFragment.Listener {
+    ActivityCompat.OnRequestPermissionsResultCallback,
+    AspectRatioFragment.Listener {
 
-    private static final String TAG = "MainActivity";
+  private static final String TAG = "MainActivity";
 
-    private static final int REQUEST_CAMERA_PERMISSION = 1;
+  private static final int REQUEST_CAMERA_PERMISSION = 1;
 
-    private static final String FRAGMENT_DIALOG = "dialog";
+  private static final String FRAGMENT_DIALOG = "dialog";
 
-    private static final int[] FLASH_OPTIONS = {
-            CameraView.FLASH_AUTO,
-            CameraView.FLASH_OFF,
-            CameraView.FLASH_ON,
-    };
+  private static final int[] FLASH_OPTIONS = {
+      CameraView.FLASH_AUTO,
+      CameraView.FLASH_OFF,
+      CameraView.FLASH_ON,
+  };
 
-    private static final int[] FLASH_ICONS = {
-            R.drawable.ic_flash_auto,
-            R.drawable.ic_flash_off,
-            R.drawable.ic_flash_on,
-    };
+  private static final int[] FLASH_ICONS = {
+      R.drawable.ic_flash_auto,
+      R.drawable.ic_flash_off,
+      R.drawable.ic_flash_on,
+  };
 
-    private static final int[] FLASH_TITLES = {
-            R.string.flash_auto,
-            R.string.flash_off,
-            R.string.flash_on,
-    };
+  private static final int[] FLASH_TITLES = {
+      R.string.flash_auto,
+      R.string.flash_off,
+      R.string.flash_on,
+  };
 
-    private int mCurrentFlash;
+  private int mCurrentFlash;
 
-    private CameraView mCameraView;
+  private CameraView mCameraView;
 
-    private Handler mBackgroundHandler;
+  private Handler mBackgroundHandler;
 
-    private TextView mTalkingToUser;
+  private TextView mTalkingToUser;
 
-    private FloatingActionButton mTakingPictureFab;
+  private FloatingActionButton mTakingPictureFab;
 
-    private View.OnClickListener mOnClickListener = new View.OnClickListener() {
+  private View.OnClickListener mOnClickListener = new View.OnClickListener() {
+    @Override
+    public void onClick(View v) {
+      switch (v.getId()) {
+        case R.id.take_picture:
+          if (mCameraView != null) {
+            mTakingPictureFab.hide();
+            new CountDownTimer(4020, 1000) {
+
+              @Override
+              public void onTick(long l) {
+                long leftSeconds = l / 1000;
+                if (leftSeconds > 0) {
+                  mTalkingToUser.setText(String.valueOf(leftSeconds));
+                } else {
+                  mTalkingToUser.setText("Cheeeese!");
+                }
+              }
+
+              @Override
+              public void onFinish() {
+                mCameraView.takePicture();
+                mTalkingToUser.setText("");
+                mTakingPictureFab.show();
+              }
+            }.start();
+          }
+          break;
+      }
+    }
+  };
+  private CameraView.Callback mCallback
+      = new CameraView.Callback() {
+
+    @Override
+    public void onCameraOpened(CameraView cameraView) {
+      Log.d(TAG, "onCameraOpened");
+    }
+
+    @Override
+    public void onCameraClosed(CameraView cameraView) {
+      Log.d(TAG, "onCameraClosed");
+    }
+
+    @Override
+    public void onPictureTaken(CameraView cameraView, final byte[] data) {
+      Log.d(TAG, "onPictureTaken " + data.length);
+      Toast.makeText(cameraView.getContext(), R.string.picture_taken, Toast.LENGTH_SHORT)
+          .show();
+      getBackgroundHandler().post(new Runnable() {
         @Override
-        public void onClick(View v) {
-            switch (v.getId()) {
-                case R.id.take_picture:
-                    if (mCameraView != null) {
-                        mTakingPictureFab.hide();
-                        new CountDownTimer(4020, 1000) {
-
-                            @Override
-                            public void onTick(long l) {
-                                long leftSeconds = l / 1000;
-                                if (leftSeconds > 0) {
-                                    mTalkingToUser.setText(String.valueOf(leftSeconds));
-                                } else {
-                                    mTalkingToUser.setText("Cheeeese!");
-                                }
-                            }
-
-                            @Override
-                            public void onFinish() {
-                                mCameraView.takePicture();
-                                mTalkingToUser.setText("");
-                                mTakingPictureFab.show();
-                            }
-                        }.start();
-                    }
-                    break;
+        public void run() {
+          File file = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES),
+              "picture-" + System.currentTimeMillis() + ".jpg");
+          Log.d(TAG, "Saving to " + file.getAbsolutePath());
+          OutputStream os = null;
+          try {
+            os = new FileOutputStream(file);
+            os.write(data);
+            os.close();
+          } catch (IOException e) {
+            Log.w(TAG, "Cannot write to " + file, e);
+          } finally {
+            if (os != null) {
+              try {
+                os.close();
+              } catch (IOException e) {
+                // Ignore
+              }
             }
+          }
         }
-    };
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        mCameraView = (CameraView) findViewById(R.id.camera);
-        if (mCameraView != null) {
-            mCameraView.addCallback(mCallback);
-        }
-        mTalkingToUser = (TextView) findViewById(R.id.talkingToUser);
-        mTakingPictureFab = (FloatingActionButton) findViewById(R.id.take_picture);
-        if (mTakingPictureFab != null) {
-            mTakingPictureFab.setOnClickListener(mOnClickListener);
-        }
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayShowTitleEnabled(false);
-        }
+      });
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-                == PackageManager.PERMISSION_GRANTED) {
-            mCameraView.start();
-        } else if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                Manifest.permission.CAMERA)) {
-            ConfirmationDialogFragment
-                    .newInstance(R.string.camera_permission_confirmation,
-                            new String[]{Manifest.permission.CAMERA},
-                            REQUEST_CAMERA_PERMISSION,
-                            R.string.camera_permission_not_granted)
-                    .show(getSupportFragmentManager(), FRAGMENT_DIALOG);
-        } else {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA},
-                    REQUEST_CAMERA_PERMISSION);
+  };
+
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_main);
+    mCameraView = (CameraView) findViewById(R.id.camera);
+    if (mCameraView != null) {
+      mCameraView.addCallback(mCallback);
+    }
+    mTalkingToUser = (TextView) findViewById(R.id.talkingToUser);
+    mTakingPictureFab = (FloatingActionButton) findViewById(R.id.take_picture);
+    if (mTakingPictureFab != null) {
+      mTakingPictureFab.setOnClickListener(mOnClickListener);
+    }
+    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+    setSupportActionBar(toolbar);
+    ActionBar actionBar = getSupportActionBar();
+    if (actionBar != null) {
+      actionBar.setDisplayShowTitleEnabled(false);
+    }
+  }
+
+  @Override
+  protected void onResume() {
+    super.onResume();
+    if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+        == PackageManager.PERMISSION_GRANTED) {
+      mCameraView.start();
+    } else if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+        Manifest.permission.CAMERA)) {
+      ConfirmationDialogFragment
+          .newInstance(R.string.camera_permission_confirmation,
+              new String[]{Manifest.permission.CAMERA},
+              REQUEST_CAMERA_PERMISSION,
+              R.string.camera_permission_not_granted)
+          .show(getSupportFragmentManager(), FRAGMENT_DIALOG);
+    } else {
+      ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA},
+          REQUEST_CAMERA_PERMISSION);
+    }
+  }
+
+  @Override
+  protected void onPause() {
+    mCameraView.stop();
+    super.onPause();
+  }
+
+  @Override
+  protected void onDestroy() {
+    super.onDestroy();
+    if (mBackgroundHandler != null) {
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+        mBackgroundHandler.getLooper().quitSafely();
+      } else {
+        mBackgroundHandler.getLooper().quit();
+      }
+      mBackgroundHandler = null;
+    }
+  }
+
+  @Override
+  public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                         @NonNull int[] grantResults) {
+    switch (requestCode) {
+      case REQUEST_CAMERA_PERMISSION:
+        if (permissions.length != 1 || grantResults.length != 1) {
+          throw new RuntimeException("Error on requesting camera permission.");
         }
-    }
-
-    @Override
-    protected void onPause() {
-        mCameraView.stop();
-        super.onPause();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (mBackgroundHandler != null) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-                mBackgroundHandler.getLooper().quitSafely();
-            } else {
-                mBackgroundHandler.getLooper().quit();
-            }
-            mBackgroundHandler = null;
+        if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+          Toast.makeText(this, R.string.camera_permission_not_granted,
+              Toast.LENGTH_SHORT).show();
         }
+        // No need to start camera here; it is handled by onResume
+        break;
     }
+  }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
-        switch (requestCode) {
-            case REQUEST_CAMERA_PERMISSION:
-                if (permissions.length != 1 || grantResults.length != 1) {
-                    throw new RuntimeException("Error on requesting camera permission.");
-                }
-                if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(this, R.string.camera_permission_not_granted,
-                            Toast.LENGTH_SHORT).show();
-                }
-                // No need to start camera here; it is handled by onResume
-                break;
+  @Override
+  public boolean onCreateOptionsMenu(Menu menu) {
+    getMenuInflater().inflate(R.menu.main, menu);
+    return true;
+  }
+
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    switch (item.getItemId()) {
+      case R.id.aspect_ratio:
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        if (mCameraView != null
+            && fragmentManager.findFragmentByTag(FRAGMENT_DIALOG) == null) {
+          final Set<AspectRatio> ratios = mCameraView.getSupportedAspectRatios();
+          final AspectRatio currentRatio = mCameraView.getAspectRatio();
+          AspectRatioFragment.newInstance(ratios, currentRatio)
+              .show(fragmentManager, FRAGMENT_DIALOG);
         }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main, menu);
         return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.aspect_ratio:
-                FragmentManager fragmentManager = getSupportFragmentManager();
-                if (mCameraView != null
-                        && fragmentManager.findFragmentByTag(FRAGMENT_DIALOG) == null) {
-                    final Set<AspectRatio> ratios = mCameraView.getSupportedAspectRatios();
-                    final AspectRatio currentRatio = mCameraView.getAspectRatio();
-                    AspectRatioFragment.newInstance(ratios, currentRatio)
-                            .show(fragmentManager, FRAGMENT_DIALOG);
-                }
-                return true;
-            case R.id.switch_flash:
+      case R.id.switch_flash:
                 /*
                 if (mCameraView != null) {
                     mCurrentFlash = (mCurrentFlash + 1) % FLASH_OPTIONS.length;
@@ -237,188 +282,141 @@ public class MainActivity extends AppCompatActivity implements
                     mCameraView.setFlash(FLASH_OPTIONS[mCurrentFlash]);
                 }
                 */
-                createGif();
-                return true;
-            case R.id.switch_camera:
-                if (mCameraView != null) {
-                    int facing = mCameraView.getFacing();
-                    mCameraView.setFacing(facing == CameraView.FACING_FRONT ?
-                            CameraView.FACING_BACK : CameraView.FACING_FRONT);
-                }
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onAspectRatioSelected(@NonNull AspectRatio ratio) {
+        createGif();
+        return true;
+      case R.id.switch_camera:
         if (mCameraView != null) {
-            Toast.makeText(this, ratio.toString(), Toast.LENGTH_SHORT).show();
-            mCameraView.setAspectRatio(ratio);
+          int facing = mCameraView.getFacing();
+          mCameraView.setFacing(facing == CameraView.FACING_FRONT ?
+              CameraView.FACING_BACK : CameraView.FACING_FRONT);
         }
+        return true;
     }
+    return super.onOptionsItemSelected(item);
+  }
 
-    private Handler getBackgroundHandler() {
-        if (mBackgroundHandler == null) {
-            HandlerThread thread = new HandlerThread("background");
-            thread.start();
-            mBackgroundHandler = new Handler(thread.getLooper());
-        }
-        return mBackgroundHandler;
+  @Override
+  public void onAspectRatioSelected(@NonNull AspectRatio ratio) {
+    if (mCameraView != null) {
+      Toast.makeText(this, ratio.toString(), Toast.LENGTH_SHORT).show();
+      mCameraView.setAspectRatio(ratio);
     }
+  }
 
-    private CameraView.Callback mCallback
-            = new CameraView.Callback() {
+  private Handler getBackgroundHandler() {
+    if (mBackgroundHandler == null) {
+      HandlerThread thread = new HandlerThread("background");
+      thread.start();
+      mBackgroundHandler = new Handler(thread.getLooper());
+    }
+    return mBackgroundHandler;
+  }
 
-        @Override
-        public void onCameraOpened(CameraView cameraView) {
-            Log.d(TAG, "onCameraOpened");
-        }
-
-        @Override
-        public void onCameraClosed(CameraView cameraView) {
-            Log.d(TAG, "onCameraClosed");
-        }
-
-        @Override
-        public void onPictureTaken(CameraView cameraView, final byte[] data) {
-            Log.d(TAG, "onPictureTaken " + data.length);
-            Toast.makeText(cameraView.getContext(), R.string.picture_taken, Toast.LENGTH_SHORT)
-                    .show();
-            getBackgroundHandler().post(new Runnable() {
-                @Override
-                public void run() {
-                    File file = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES),
-                            "picture-" + System.currentTimeMillis() + ".jpg");
-                    Log.d(TAG, "Saving to " + file.getAbsolutePath());
-                    OutputStream os = null;
-                    try {
-                        os = new FileOutputStream(file);
-                        os.write(data);
-                        os.close();
-                    } catch (IOException e) {
-                        Log.w(TAG, "Cannot write to " + file, e);
-                    } finally {
-                        if (os != null) {
-                            try {
-                                os.close();
-                            } catch (IOException e) {
-                                // Ignore
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-    };
-
-    private void createGif() {
-        getBackgroundHandler().post(new Runnable() {
-            @Override
-            public void run() {
-                File takenPictures = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-                File file = new File(takenPictures,
-                        "gif-" + System.currentTimeMillis() + ".gif");
-                OutputStream os = null;
-                ByteArrayOutputStream bos = null;
-                try {
-                    AnimatedGifEncoder encoder = new AnimatedGifEncoder();
-                    bos = new ByteArrayOutputStream();
-                    encoder.setDelay(300);
-                    encoder.start(bos);
-                    for (File nextPic: takenPictures.listFiles()) {
-                        if (nextPic.getName().startsWith("picture-")) {
-                            Log.d(TAG, "adding frame for pic " + nextPic.getName());
-                            encoder.addFrame(nextBitmap(nextPic));
-                        }
-                    }
-                    encoder.finish();
-
-
-                    os = new FileOutputStream(file);
-                    os.write(bos.toByteArray());
-                    os.close();
-                    bos.close();
-                    Log.d(TAG, "Saved gif to " + file.getAbsolutePath());
-                } catch (IOException e) {
-                    Log.w(TAG, "Cannot write to " + file, e);
-                } finally {
-                    if (os != null) {
-                        try {
-                            os.close();
-                        } catch (IOException e) {
-                            // Ignore
-                        }
-                    }
-                }
-                if (bos != null) {
-                    try {
-                        bos.close();
-                    } catch (IOException e) {
-                        // Ignore
-                    }
-                }
+  private void createGif() {
+    getBackgroundHandler().post(new Runnable() {
+      @Override
+      public void run() {
+        File takenPictures = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File file = new File(takenPictures,
+            "gif-" + System.currentTimeMillis() + ".gif");
+        OutputStream os = null;
+        ByteArrayOutputStream bos = null;
+        try {
+          AnimatedGifEncoder encoder = new AnimatedGifEncoder();
+          bos = new ByteArrayOutputStream();
+          encoder.setDelay(300);
+          encoder.start(bos);
+          for (File nextPic : takenPictures.listFiles()) {
+            if (nextPic.getName().startsWith("picture-")) {
+              Log.d(TAG, "adding frame for pic " + nextPic.getName());
+              encoder.addFrame(nextBitmap(nextPic));
             }
-        });
-    }
+          }
+          encoder.finish();
 
-    private Bitmap nextBitmap(File nextPicPath) {
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-        Bitmap bitmap = BitmapFactory.decodeFile(nextPicPath.getAbsolutePath(), options);
-        return bitmap;
-    }
-
-    public static class ConfirmationDialogFragment extends DialogFragment {
-
-        private static final String ARG_MESSAGE = "message";
-        private static final String ARG_PERMISSIONS = "permissions";
-        private static final String ARG_REQUEST_CODE = "request_code";
-        private static final String ARG_NOT_GRANTED_MESSAGE = "not_granted_message";
-
-        public static ConfirmationDialogFragment newInstance(@StringRes int message,
-                                                             String[] permissions, int requestCode, @StringRes int notGrantedMessage) {
-            ConfirmationDialogFragment fragment = new ConfirmationDialogFragment();
-            Bundle args = new Bundle();
-            args.putInt(ARG_MESSAGE, message);
-            args.putStringArray(ARG_PERMISSIONS, permissions);
-            args.putInt(ARG_REQUEST_CODE, requestCode);
-            args.putInt(ARG_NOT_GRANTED_MESSAGE, notGrantedMessage);
-            fragment.setArguments(args);
-            return fragment;
+          os = new FileOutputStream(file);
+          os.write(bos.toByteArray());
+          os.close();
+          bos.close();
+          Log.d(TAG, "Saved gif to " + file.getAbsolutePath());
+        } catch (IOException e) {
+          Log.w(TAG, "Cannot write to " + file, e);
+        } finally {
+          if (os != null) {
+            try {
+              os.close();
+            } catch (IOException e) {
+              // Ignore
+            }
+          }
         }
-
-        @NonNull
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            final Bundle args = getArguments();
-            return new AlertDialog.Builder(getActivity())
-                    .setMessage(args.getInt(ARG_MESSAGE))
-                    .setPositiveButton(android.R.string.ok,
-                            new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    String[] permissions = args.getStringArray(ARG_PERMISSIONS);
-                                    if (permissions == null) {
-                                        throw new IllegalArgumentException();
-                                    }
-                                    ActivityCompat.requestPermissions(getActivity(),
-                                            permissions, args.getInt(ARG_REQUEST_CODE));
-                                }
-                            })
-                    .setNegativeButton(android.R.string.cancel,
-                            new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    Toast.makeText(getActivity(),
-                                            args.getInt(ARG_NOT_GRANTED_MESSAGE),
-                                            Toast.LENGTH_SHORT).show();
-                                }
-                            })
-                    .create();
+        if (bos != null) {
+          try {
+            bos.close();
+          } catch (IOException e) {
+            // Ignore
+          }
         }
+      }
+    });
+  }
 
+  private Bitmap nextBitmap(File nextPicPath) {
+    BitmapFactory.Options options = new BitmapFactory.Options();
+    options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+    Bitmap bitmap = BitmapFactory.decodeFile(nextPicPath.getAbsolutePath(), options);
+    return bitmap;
+  }
+
+  public static class ConfirmationDialogFragment extends DialogFragment {
+
+    private static final String ARG_MESSAGE = "message";
+    private static final String ARG_PERMISSIONS = "permissions";
+    private static final String ARG_REQUEST_CODE = "request_code";
+    private static final String ARG_NOT_GRANTED_MESSAGE = "not_granted_message";
+
+    public static ConfirmationDialogFragment newInstance(@StringRes int message,
+                                                         String[] permissions, int requestCode, @StringRes int notGrantedMessage) {
+      ConfirmationDialogFragment fragment = new ConfirmationDialogFragment();
+      Bundle args = new Bundle();
+      args.putInt(ARG_MESSAGE, message);
+      args.putStringArray(ARG_PERMISSIONS, permissions);
+      args.putInt(ARG_REQUEST_CODE, requestCode);
+      args.putInt(ARG_NOT_GRANTED_MESSAGE, notGrantedMessage);
+      fragment.setArguments(args);
+      return fragment;
     }
+
+    @NonNull
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+      final Bundle args = getArguments();
+      return new AlertDialog.Builder(getActivity())
+          .setMessage(args.getInt(ARG_MESSAGE))
+          .setPositiveButton(android.R.string.ok,
+              new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                  String[] permissions = args.getStringArray(ARG_PERMISSIONS);
+                  if (permissions == null) {
+                    throw new IllegalArgumentException();
+                  }
+                  ActivityCompat.requestPermissions(getActivity(),
+                      permissions, args.getInt(ARG_REQUEST_CODE));
+                }
+              })
+          .setNegativeButton(android.R.string.cancel,
+              new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                  Toast.makeText(getActivity(),
+                      args.getInt(ARG_NOT_GRANTED_MESSAGE),
+                      Toast.LENGTH_SHORT).show();
+                }
+              })
+          .create();
+    }
+
+  }
 
 }
