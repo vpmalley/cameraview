@@ -450,6 +450,13 @@ public class CameraView extends FrameLayout {
         }
 
         @Override
+        public void onProgress(long percentage) {
+            for (Callback callback : mCallbacks) {
+                callback.onProgress(percentage);
+            }
+        }
+
+        @Override
         public void onAllPicturesTaken() {
             for (Callback callback : mCallbacks) {
                 callback.onAllPicturesTaken();
@@ -541,6 +548,14 @@ public class CameraView extends FrameLayout {
          * @param data                  JPEG data.
          */
         public void onPictureTaken(CameraView cameraView, byte[] data) {
+        }
+
+        /**
+         * Called when pictures are taken.
+         *
+         * @param percentage        The progress made, as a percentage - between 0 ad 100
+         */
+        public void onProgress(long percentage) {
         }
 
         /**

@@ -178,6 +178,11 @@ public class CameraActivity extends AppCompatActivity implements
     }
 
     @Override
+    public void onProgress(long percentage) {
+      Log.d(TAG, "made progress at " + percentage);
+    }
+
+    @Override
     public void onAllPicturesTaken() {
       mTalkingToUser.setText("Processing gif");
       createGif(mPictureSessionFolder);
@@ -364,6 +369,14 @@ public class CameraActivity extends AppCompatActivity implements
             // Ignore
           }
         }
+        Log.d(TAG, "Gif processed");
+        mTalkingToUser.post(new Runnable() {
+          @Override
+          public void run() {
+            mTalkingToUser.setText("Gif processed");
+            mTakingPictureFab.show();
+          }
+        });
       }
     });
   }

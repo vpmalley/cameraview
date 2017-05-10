@@ -647,10 +647,11 @@ class Camera2 extends CameraViewImpl {
                             unlockFocus();
                         }
                     }, null);
-            new CountDownTimer(6000, 1000) {
+            new CountDownTimer(6000, 100) {
 
                 @Override
                 public void onTick(long l) {
+                    mCallback.onProgress(l / 60);
                 }
 
                 @Override

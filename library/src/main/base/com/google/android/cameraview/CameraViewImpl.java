@@ -77,8 +77,9 @@ abstract class CameraViewImpl {
 
         void onPictureTaken(byte[] data);
 
-        void onAllPicturesTaken();
+        void onProgress(long percentage);
 
+        void onAllPicturesTaken();
     }
 
 }
