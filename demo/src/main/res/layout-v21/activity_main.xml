@@ -66,5 +66,5 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:visibility="gone"
-        style="@android:style/Widget.ProgressBar.Horizontal" />
+        style="@android:style/Widget.Material.ProgressBar.Horizontal" />
 </RelativeLayout>
