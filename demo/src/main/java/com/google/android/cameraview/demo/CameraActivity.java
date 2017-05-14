@@ -43,6 +43,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -101,6 +102,8 @@ public class CameraActivity extends AppCompatActivity implements
   private TextView mTalkingToUser;
 
   private FloatingActionButton mTakingPictureFab;
+
+  private ProgressBar mProgress;
 
   private View.OnClickListener mOnClickListener = new View.OnClickListener() {
     @Override
@@ -180,6 +183,12 @@ public class CameraActivity extends AppCompatActivity implements
     @Override
     public void onProgress(long percentage) {
       Log.d(TAG, "made progress at " + percentage);
+      mProgress.setProgress((int) (100 - percentage));
+      if (percentage < 5) {
+        mProgress.setVisibility(View.GONE);
+      } else {
+        mProgress.setVisibility(View.VISIBLE);
+      }
     }
 
     @Override
@@ -202,6 +211,7 @@ public class CameraActivity extends AppCompatActivity implements
     if (mTakingPictureFab != null) {
       mTakingPictureFab.setOnClickListener(mOnClickListener);
     }
+    mProgress = (ProgressBar) findViewById(R.id.picture_progress);
     Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
     setSupportActionBar(toolbar);
     ActionBar actionBar = getSupportActionBar();
