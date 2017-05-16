@@ -40,7 +40,7 @@
         android:adjustViewBounds="true"
         android:textAlignment="center"
         android:textColor="@android:color/white"
-        android:textSize="30sp" />
+        android:textSize="40sp" />
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
@@ -62,10 +62,11 @@
     <ProgressBar
         android:id="@+id/picture_progress"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="20dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
+        android:paddingBottom="10dp"
         android:visibility="gone"
-        android:color="@color/secondary"
+        android:color="@color/accent"
         style="@android:style/Widget.ProgressBar.Horizontal" />
 </RelativeLayout>

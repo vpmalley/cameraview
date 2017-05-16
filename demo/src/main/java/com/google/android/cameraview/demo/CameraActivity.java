@@ -182,15 +182,14 @@ public class CameraActivity extends AppCompatActivity implements
     public void onProgress(long percentage) {
       Log.d(TAG, "made progress at " + percentage);
       mProgress.setProgress((int) (100 - percentage));
-      if (percentage < 3) {
-        mProgress.setVisibility(View.GONE);
-      } else {
+      if (percentage > 95) {
         mProgress.setVisibility(View.VISIBLE);
       }
     }
 
     @Override
     public void onAllPicturesTaken() {
+      mProgress.setVisibility(View.GONE);
       mTalkingToUser.setText("Processing gif");
       createGif(mPictureSessionFolder);
     }

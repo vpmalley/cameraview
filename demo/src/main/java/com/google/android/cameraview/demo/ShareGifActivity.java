@@ -53,7 +53,7 @@ public class ShareGifActivity extends AppCompatActivity {
     mTalkingToUser = (TextView) findViewById(R.id.talkingToUser);
     mTakingPictureFab = (FloatingActionButton) findViewById(R.id.share_picture);
     if (mTakingPictureFab != null) {
-      mTakingPictureFab.setOnClickListener();
+      // mTakingPictureFab.setOnClickListener();
     }
     Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
     setSupportActionBar(toolbar);
