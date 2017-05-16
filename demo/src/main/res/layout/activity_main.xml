@@ -40,7 +40,7 @@
         android:adjustViewBounds="true"
         android:textAlignment="center"
         android:textColor="@android:color/white"
-        android:textSize="20sp" />
+        android:textSize="30sp" />
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
@@ -66,5 +66,6 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:visibility="gone"
+        android:color="@color/secondary"
         style="@android:style/Widget.ProgressBar.Horizontal" />
 </RelativeLayout>

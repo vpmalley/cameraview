@@ -149,8 +149,6 @@ public class CameraActivity extends AppCompatActivity implements
     @Override
     public void onPictureTaken(CameraView cameraView, final byte[] data) {
       Log.d(TAG, "onPictureTaken " + data.length);
-      Toast.makeText(cameraView.getContext(), R.string.picture_taken, Toast.LENGTH_SHORT)
-          .show();
       getBackgroundHandler().post(new Runnable() {
         @Override
         public void run() {
@@ -184,7 +182,7 @@ public class CameraActivity extends AppCompatActivity implements
     public void onProgress(long percentage) {
       Log.d(TAG, "made progress at " + percentage);
       mProgress.setProgress((int) (100 - percentage));
-      if (percentage < 5) {
+      if (percentage < 3) {
         mProgress.setVisibility(View.GONE);
       } else {
         mProgress.setVisibility(View.VISIBLE);
