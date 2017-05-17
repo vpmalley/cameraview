@@ -16,6 +16,8 @@
 
 package com.google.android.cameraview.demo;
 
+import android.content.Intent;
+import android.graphics.Movie;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -24,10 +26,16 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 public class ShareGifActivity extends AppCompatActivity {
 
@@ -60,6 +68,26 @@ public class ShareGifActivity extends AppCompatActivity {
     ActionBar actionBar = getSupportActionBar();
     if (actionBar != null) {
       actionBar.setDisplayShowTitleEnabled(false);
+    }
+    Intent i = getIntent();
+    if (i != null) {
+      String gifAbsolutePath = i.getStringExtra("GIF_PATH");
+      /*
+      FileInputStream gifFis = null;
+      try {
+        gifFis = new FileInputStream(new File(gifAbsolutePath));
+        //Movie gifMovie = Movie.decodeStream(gifFis);
+      } catch (FileNotFoundException e) {
+        Log.w("ShareGifActivity", "failed getting gif", e);
+      } finally {
+        if (gifFis != null) {
+          try {
+            gifFis.close();
+          } catch (IOException e) {
+          }
+        }
+      }
+      */
     }
   }
 

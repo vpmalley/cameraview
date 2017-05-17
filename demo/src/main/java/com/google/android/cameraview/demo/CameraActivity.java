@@ -19,6 +19,7 @@ package com.google.android.cameraview.demo;
 import android.Manifest;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -336,7 +337,7 @@ public class CameraActivity extends AppCompatActivity implements
         if (!pictureSessionDir.isDirectory()) {
           return;
         }
-        File gifFile = new File(pictureSessionDir,
+        final File gifFile = new File(pictureSessionDir,
             "gif-" + System.currentTimeMillis() + ".gif");
         OutputStream os = null;
         ByteArrayOutputStream bos = null;
@@ -380,12 +381,19 @@ public class CameraActivity extends AppCompatActivity implements
         mTalkingToUser.post(new Runnable() {
           @Override
           public void run() {
-            mTalkingToUser.setText("Gif processed");
-            mTakingPictureFab.show();
+            onGifProcessed(gifFile.getAbsolutePath());
           }
         });
       }
     });
+  }
+
+  private void onGifProcessed(String gifAbsolutePath) {
+    mTalkingToUser.setText("Gif processed");
+    mTakingPictureFab.show();
+    Intent i = new Intent(this, ShareGifActivity.class);
+    i.putExtra("GIF_PATH", gifAbsolutePath);
+    startActivity(i);
   }
 
   private Bitmap bitmapOf(File nextPicPath) {
