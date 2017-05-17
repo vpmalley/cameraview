@@ -198,7 +198,7 @@ public class CameraActivity extends AppCompatActivity implements
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_main);
+    setContentView(R.layout.activity_camera);
     mCameraView = (CameraView) findViewById(R.id.camera);
     if (mCameraView != null) {
       mCameraView.addCallback(mCallback);
