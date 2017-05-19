@@ -17,9 +17,11 @@
 package com.google.android.cameraview.demo;
 
 import android.content.Intent;
-import android.graphics.Movie;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.design.widget.FloatingActionButton;
@@ -32,10 +34,14 @@ import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.nbadal.gifencoder.AnimatedGifEncoder;
+
+import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
 public class ShareGifActivity extends AppCompatActivity {
 
@@ -52,6 +58,7 @@ public class ShareGifActivity extends AppCompatActivity {
   private TextView mTalkingToUser;
 
   private FloatingActionButton mTakingPictureFab;
+  private String gifFolderPath;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -60,9 +67,6 @@ public class ShareGifActivity extends AppCompatActivity {
     mGifVisualization = (ImageView) findViewById(R.id.gif);
     mTalkingToUser = (TextView) findViewById(R.id.talkingToUser);
     mTakingPictureFab = (FloatingActionButton) findViewById(R.id.share_picture);
-    if (mTakingPictureFab != null) {
-      // mTakingPictureFab.setOnClickListener();
-    }
     Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
     setSupportActionBar(toolbar);
     ActionBar actionBar = getSupportActionBar();
@@ -71,29 +75,27 @@ public class ShareGifActivity extends AppCompatActivity {
     }
     Intent i = getIntent();
     if (i != null) {
-      String gifAbsolutePath = i.getStringExtra("GIF_PATH");
-      /*
-      FileInputStream gifFis = null;
-      try {
-        gifFis = new FileInputStream(new File(gifAbsolutePath));
-        //Movie gifMovie = Movie.decodeStream(gifFis);
-      } catch (FileNotFoundException e) {
-        Log.w("ShareGifActivity", "failed getting gif", e);
-      } finally {
-        if (gifFis != null) {
-          try {
-            gifFis.close();
-          } catch (IOException e) {
-          }
-        }
-      }
-      */
+      gifFolderPath = i.getStringExtra("GIF_PATH");
     }
+
   }
 
   @Override
   protected void onResume() {
     super.onResume();
+    if (mTakingPictureFab != null) {
+      // mTakingPictureFab.setOnClickListener();
+      mTakingPictureFab.hide();
+    }
+    File externalFilesDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+    File picturesSessionDir = new File(externalFilesDir, gifFolderPath);
+    File[] files = picturesSessionDir.listFiles();
+    if ((files.length > 0) && (mGifVisualization != null)) {
+      Glide.with(this)
+          .load(files[0].getAbsolutePath())
+          .into(mGifVisualization);
+    }
+    createGif(gifFolderPath);
   }
 
   @Override
@@ -140,6 +142,85 @@ public class ShareGifActivity extends AppCompatActivity {
       mBackgroundHandler = new Handler(thread.getLooper());
     }
     return mBackgroundHandler;
+  }
+
+  private void createGif(final String pictureSessionFolder) {
+    getBackgroundHandler().post(new Runnable() {
+      @Override
+      public void run() {
+        File pictureSessionDir = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), pictureSessionFolder);
+        if (!pictureSessionDir.isDirectory()) {
+          return;
+        }
+        final File gifFile = new File(pictureSessionDir,
+            "gif-" + System.currentTimeMillis() + ".gif");
+        OutputStream os = null;
+        ByteArrayOutputStream bos = null;
+        try {
+          AnimatedGifEncoder gifEncoder = new AnimatedGifEncoder();
+          bos = new ByteArrayOutputStream();
+          gifEncoder.setDelay(300);
+          gifEncoder.start(bos);
+          for (File nextPic : pictureSessionDir.listFiles()) {
+            if (nextPic.getName().startsWith("picture-")) {
+              Log.d(TAG, "getting bitmap for pic " + nextPic.getName());
+              Bitmap bitmap = bitmapOf(nextPic);
+              Log.d(TAG, "adding frame for pic " + nextPic.getName());
+              gifEncoder.addFrame(bitmap);
+            }
+          }
+          gifEncoder.finish();
+
+          os = new FileOutputStream(gifFile);
+          os.write(bos.toByteArray());
+          os.close();
+          bos.close();
+          Log.d(TAG, "Saved gif to " + gifFile.getAbsolutePath());
+        } catch (IOException e) {
+          Log.w(TAG, "Cannot write to " + gifFile, e);
+        } finally {
+          if (os != null) {
+            try {
+              os.close();
+            } catch (IOException e) {
+              // Ignore
+            }
+          }
+        }
+        if (bos != null) {
+          try {
+            bos.close();
+          } catch (IOException e) {
+            // Ignore
+          }
+        }
+        Log.d(TAG, "Gif processed");
+        /*
+        mTalkingToUser.post(new Runnable() {
+          @Override
+          public void run() {
+            onGifProcessed(gifFile.getAbsolutePath());
+          }
+        });
+        */
+      }
+    });
+  }
+
+  private void onGifProcessed(String gifAbsolutePath) {
+    mTalkingToUser.setText("Gif processed");
+    Log.d(TAG, "Gif processed");
+    mTakingPictureFab.show();
+    Glide.with(this)
+        .load(gifAbsolutePath)
+        .into(mGifVisualization);
+  }
+
+  private Bitmap bitmapOf(File nextPicPath) {
+    BitmapFactory.Options options = new BitmapFactory.Options();
+    options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+    Bitmap bitmap = BitmapFactory.decodeFile(nextPicPath.getAbsolutePath(), options);
+    return bitmap;
   }
 
 }

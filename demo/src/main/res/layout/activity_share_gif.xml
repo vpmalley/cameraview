@@ -28,7 +28,8 @@
         android:layout_alignParentTop="true"
         android:adjustViewBounds="true"
         app:srcCompat="@drawable/background"
-        android:background="@android:color/black" />
+        android:background="@android:color/black"
+        android:contentDescription="gif is displayed here"/>
 
     <TextView
         android:id="@+id/talkingToUser"

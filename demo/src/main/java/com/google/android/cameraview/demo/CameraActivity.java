@@ -192,7 +192,10 @@ public class CameraActivity extends AppCompatActivity implements
     public void onAllPicturesTaken() {
       mProgress.setVisibility(View.GONE);
       mTalkingToUser.setText("Processing gif");
-      createGif(mPictureSessionFolder);
+
+      Intent i = new Intent(CameraActivity.this, ShareGifActivity.class);
+      i.putExtra("GIF_PATH", mPictureSessionFolder);
+      startActivity(i);
     }
   };
 
@@ -327,80 +330,6 @@ public class CameraActivity extends AppCompatActivity implements
       mBackgroundHandler = new Handler(thread.getLooper());
     }
     return mBackgroundHandler;
-  }
-
-  private void createGif(final String pictureSessionFolder) {
-    getBackgroundHandler().post(new Runnable() {
-      @Override
-      public void run() {
-        File pictureSessionDir = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), pictureSessionFolder);
-        if (!pictureSessionDir.isDirectory()) {
-          return;
-        }
-        final File gifFile = new File(pictureSessionDir,
-            "gif-" + System.currentTimeMillis() + ".gif");
-        OutputStream os = null;
-        ByteArrayOutputStream bos = null;
-        try {
-          AnimatedGifEncoder gifEncoder = new AnimatedGifEncoder();
-          bos = new ByteArrayOutputStream();
-          gifEncoder.setDelay(300);
-          gifEncoder.start(bos);
-          for (File nextPic : pictureSessionDir.listFiles()) {
-            if (nextPic.getName().startsWith("picture-")) {
-              Log.d(TAG, "adding frame for pic " + nextPic.getName());
-              gifEncoder.addFrame(bitmapOf(nextPic));
-            }
-          }
-          gifEncoder.finish();
-
-          os = new FileOutputStream(gifFile);
-          os.write(bos.toByteArray());
-          os.close();
-          bos.close();
-          Log.d(TAG, "Saved gif to " + gifFile.getAbsolutePath());
-        } catch (IOException e) {
-          Log.w(TAG, "Cannot write to " + gifFile, e);
-        } finally {
-          if (os != null) {
-            try {
-              os.close();
-            } catch (IOException e) {
-              // Ignore
-            }
-          }
-        }
-        if (bos != null) {
-          try {
-            bos.close();
-          } catch (IOException e) {
-            // Ignore
-          }
-        }
-        Log.d(TAG, "Gif processed");
-        mTalkingToUser.post(new Runnable() {
-          @Override
-          public void run() {
-            onGifProcessed(gifFile.getAbsolutePath());
-          }
-        });
-      }
-    });
-  }
-
-  private void onGifProcessed(String gifAbsolutePath) {
-    mTalkingToUser.setText("Gif processed");
-    mTakingPictureFab.show();
-    Intent i = new Intent(this, ShareGifActivity.class);
-    i.putExtra("GIF_PATH", gifAbsolutePath);
-    startActivity(i);
-  }
-
-  private Bitmap bitmapOf(File nextPicPath) {
-    BitmapFactory.Options options = new BitmapFactory.Options();
-    options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-    Bitmap bitmap = BitmapFactory.decodeFile(nextPicPath.getAbsolutePath(), options);
-    return bitmap;
   }
 
   public static class ConfirmationDialogFragment extends DialogFragment {
