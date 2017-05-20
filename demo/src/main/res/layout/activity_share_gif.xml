@@ -26,8 +26,6 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:adjustViewBounds="true"
-        app:srcCompat="@drawable/background"
         android:background="@android:color/black"
         android:contentDescription="gif is displayed here"/>
 
@@ -60,4 +58,13 @@
         android:layout_centerHorizontal="true"
         app:srcCompat="@android:drawable/ic_menu_share"
         app:useCompatPadding="true" />
+
+    <ProgressBar
+        android:id="@+id/gif_progress"
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:paddingBottom="10dp"
+        android:color="@color/accent" />
 </RelativeLayout>

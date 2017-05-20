@@ -31,7 +31,9 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -58,15 +60,19 @@ public class ShareGifActivity extends AppCompatActivity {
   private TextView mTalkingToUser;
 
   private FloatingActionButton mTakingPictureFab;
+
+  private ProgressBar mProgress;
+
   private String gifFolderPath;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_camera);
+    setContentView(R.layout.activity_share_gif);
     mGifVisualization = (ImageView) findViewById(R.id.gif);
     mTalkingToUser = (TextView) findViewById(R.id.talkingToUser);
     mTakingPictureFab = (FloatingActionButton) findViewById(R.id.share_picture);
+    mProgress = (ProgressBar) findViewById(R.id.gif_progress);
     Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
     setSupportActionBar(toolbar);
     ActionBar actionBar = getSupportActionBar();
@@ -195,19 +201,18 @@ public class ShareGifActivity extends AppCompatActivity {
           }
         }
         Log.d(TAG, "Gif processed");
-        /*
-        mTalkingToUser.post(new Runnable() {
+        mProgress.post(new Runnable() {
           @Override
           public void run() {
             onGifProcessed(gifFile.getAbsolutePath());
           }
         });
-        */
       }
     });
   }
 
   private void onGifProcessed(String gifAbsolutePath) {
+    mProgress.setVisibility(View.GONE);
     mTalkingToUser.setText("Gif processed");
     Log.d(TAG, "Gif processed");
     mTakingPictureFab.show();
