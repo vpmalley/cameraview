@@ -93,6 +93,9 @@ public class ShareGifActivity extends AppCompatActivity {
       // mTakingPictureFab.setOnClickListener();
       mTakingPictureFab.hide();
     }
+    if (mTalkingToUser != null) {
+      mTalkingToUser.setText("Processing your pics");
+    }
     File externalFilesDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
     File picturesSessionDir = new File(externalFilesDir, gifFolderPath);
     File[] files = picturesSessionDir.listFiles();

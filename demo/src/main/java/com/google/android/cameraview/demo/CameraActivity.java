@@ -191,7 +191,6 @@ public class CameraActivity extends AppCompatActivity implements
     @Override
     public void onAllPicturesTaken() {
       mProgress.setVisibility(View.GONE);
-      mTalkingToUser.setText("Processing gif");
 
       Intent i = new Intent(CameraActivity.this, ShareGifActivity.class);
       i.putExtra("GIF_PATH", mPictureSessionFolder);
