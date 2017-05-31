@@ -67,34 +67,13 @@ import java.util.Set;
  * $ adb pull /sdcard/Android/data/com.google.android.cameraview.demo/files/Pictures/picture.jpg
  */
 public class CameraActivity extends AppCompatActivity implements
-    ActivityCompat.OnRequestPermissionsResultCallback,
-    AspectRatioFragment.Listener {
+    ActivityCompat.OnRequestPermissionsResultCallback {
 
   private static final String TAG = "CameraActivity";
 
   private static final int REQUEST_CAMERA_PERMISSION = 1;
 
   private static final String FRAGMENT_DIALOG = "dialog";
-
-  private static final int[] FLASH_OPTIONS = {
-      CameraView.FLASH_AUTO,
-      CameraView.FLASH_OFF,
-      CameraView.FLASH_ON,
-  };
-
-  private static final int[] FLASH_ICONS = {
-      R.drawable.ic_flash_auto,
-      R.drawable.ic_flash_off,
-      R.drawable.ic_flash_on,
-  };
-
-  private static final int[] FLASH_TITLES = {
-      R.string.flash_auto,
-      R.string.flash_off,
-      R.string.flash_on,
-  };
-
-  private int mCurrentFlash;
 
   private CameraView mCameraView;
 
@@ -285,24 +264,6 @@ public class CameraActivity extends AppCompatActivity implements
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
     switch (item.getItemId()) {
-      case R.id.aspect_ratio:
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        if (mCameraView != null
-            && fragmentManager.findFragmentByTag(FRAGMENT_DIALOG) == null) {
-          final Set<AspectRatio> ratios = mCameraView.getSupportedAspectRatios();
-          final AspectRatio currentRatio = mCameraView.getAspectRatio();
-          AspectRatioFragment.newInstance(ratios, currentRatio)
-              .show(fragmentManager, FRAGMENT_DIALOG);
-        }
-        return true;
-      case R.id.switch_flash:
-        if (mCameraView != null) {
-          mCurrentFlash = (mCurrentFlash + 1) % FLASH_OPTIONS.length;
-          item.setTitle(FLASH_TITLES[mCurrentFlash]);
-          item.setIcon(FLASH_ICONS[mCurrentFlash]);
-          mCameraView.setFlash(FLASH_OPTIONS[mCurrentFlash]);
-        }
-        return true;
       case R.id.switch_camera:
         if (mCameraView != null) {
           int facing = mCameraView.getFacing();
@@ -312,14 +273,6 @@ public class CameraActivity extends AppCompatActivity implements
         return true;
     }
     return super.onOptionsItemSelected(item);
-  }
-
-  @Override
-  public void onAspectRatioSelected(@NonNull AspectRatio ratio) {
-    if (mCameraView != null) {
-      Toast.makeText(this, ratio.toString(), Toast.LENGTH_SHORT).show();
-      mCameraView.setAspectRatio(ratio);
-    }
   }
 
   private Handler getBackgroundHandler() {

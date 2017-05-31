@@ -125,25 +125,6 @@ public class ShareGifActivity extends AppCompatActivity {
     }
   }
 
-  @Override
-  public boolean onCreateOptionsMenu(Menu menu) {
-    getMenuInflater().inflate(R.menu.main, menu);
-    return true;
-  }
-
-  @Override
-  public boolean onOptionsItemSelected(MenuItem item) {
-    switch (item.getItemId()) {
-      case R.id.aspect_ratio:
-        return true;
-      case R.id.switch_flash:
-        return true;
-      case R.id.switch_camera:
-        return true;
-    }
-    return super.onOptionsItemSelected(item);
-  }
-
   private Handler getBackgroundHandler() {
     if (mBackgroundHandler == null) {
       HandlerThread thread = new HandlerThread("background");
