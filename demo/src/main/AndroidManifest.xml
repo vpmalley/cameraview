@@ -11,7 +11,7 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 -->
-<manifest package="com.google.android.cameraview.demo"
+<manifest package="com.google.android.giffer.giffer"
           xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission
@@ -26,14 +26,14 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Demo">
 
-        <activity android:name=".CameraActivity">
+        <activity android:name="fr.vpm.giffer.activity.CameraActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
 
-        <activity android:name=".ShareGifActivity" />
+        <activity android:name="fr.vpm.giffer.activity.ShareGifActivity" />
 
         <activity android:name="com.facebook.FacebookActivity"
                   android:configChanges=
@@ -51,6 +51,9 @@
         </activity>
         <meta-data android:name="com.facebook.sdk.ApplicationId"
                    android:value="@string/facebook_app_id"/>
+        <provider android:authorities="com.facebook.app.FacebookContentProvider"
+                  android:name="com.facebook.FacebookContentProvider"
+                  android:exported="true" />
     </application>
 
 </manifest>
