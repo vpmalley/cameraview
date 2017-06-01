@@ -33,8 +33,14 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
 import com.google.android.giffer.giffer.R;
 import com.nbadal.gifencoder.AnimatedGifEncoder;
 
@@ -63,6 +69,7 @@ public class ShareGifActivity extends AppCompatActivity {
   private ProgressBar mProgress;
 
   private String gifFolderPath;
+  private CallbackManager callbackManager;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +89,29 @@ public class ShareGifActivity extends AppCompatActivity {
     if (i != null) {
       gifFolderPath = i.getStringExtra("GIF_PATH");
     }
+
+    callbackManager = CallbackManager.Factory.create();
+
+    LoginButton loginButton = (LoginButton) findViewById(R.id.login_button);
+    loginButton.setReadPermissions("email");
+    loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+      @Override
+      public void onSuccess(LoginResult loginResult) {
+        // App code
+        Toast.makeText(ShareGifActivity.this, "You are logged in", Toast.LENGTH_SHORT).show();
+        // share picture
+      }
+
+      @Override
+      public void onCancel() {
+        // App code
+      }
+
+      @Override
+      public void onError(FacebookException exception) {
+        // App code
+      }
+    });
 
   }
 
@@ -122,6 +152,12 @@ public class ShareGifActivity extends AppCompatActivity {
       }
       mBackgroundHandler = null;
     }
+  }
+
+  @Override
+  protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    super.onActivityResult(requestCode, resultCode, data);
+    callbackManager.onActivityResult(requestCode, resultCode, data);
   }
 
   private Handler getBackgroundHandler() {

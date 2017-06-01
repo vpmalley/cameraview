@@ -59,12 +59,20 @@
         app:srcCompat="@drawable/ic_share_white_24dp"
         app:useCompatPadding="true" />
 
+    <com.facebook.login.widget.LoginButton
+        android:id="@+id/login_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="30dp"
+        android:layout_alignParentBottom="true" />
+
     <ProgressBar
         android:id="@+id/gif_progress"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:paddingBottom="10dp"
+        android:layout_marginBottom="10dp"
         android:color="@color/accent" />
 </RelativeLayout>
