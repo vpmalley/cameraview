@@ -36,16 +36,22 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
+import com.facebook.HttpMethod;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.google.android.giffer.giffer.R;
 import com.nbadal.gifencoder.AnimatedGifEncoder;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -64,12 +70,13 @@ public class ShareGifActivity extends AppCompatActivity {
 
   private TextView mTalkingToUser;
 
-  private FloatingActionButton mTakingPictureFab;
+  private FloatingActionButton mShareToFbFab;
 
   private ProgressBar mProgress;
 
   private String gifFolderPath;
   private CallbackManager callbackManager;
+  private File gifFile;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -77,7 +84,13 @@ public class ShareGifActivity extends AppCompatActivity {
     setContentView(R.layout.activity_share_gif);
     mGifVisualization = (ImageView) findViewById(R.id.gif);
     mTalkingToUser = (TextView) findViewById(R.id.talkingToUser);
-    mTakingPictureFab = (FloatingActionButton) findViewById(R.id.share_picture);
+    mShareToFbFab = (FloatingActionButton) findViewById(R.id.share_picture);
+    mShareToFbFab.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        shareGifToFb();
+      }
+    });
     mProgress = (ProgressBar) findViewById(R.id.gif_progress);
     Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
     setSupportActionBar(toolbar);
@@ -118,9 +131,9 @@ public class ShareGifActivity extends AppCompatActivity {
   @Override
   protected void onResume() {
     super.onResume();
-    if (mTakingPictureFab != null) {
-      // mTakingPictureFab.setOnClickListener();
-      mTakingPictureFab.hide();
+    if (mShareToFbFab != null) {
+      // mShareToFbFab.setOnClickListener();
+      mShareToFbFab.hide();
     }
     if (mTalkingToUser != null) {
       mTalkingToUser.setText("Processing your pics");
@@ -177,7 +190,7 @@ public class ShareGifActivity extends AppCompatActivity {
         if (!pictureSessionDir.isDirectory()) {
           return;
         }
-        final File gifFile = new File(pictureSessionDir,
+        gifFile = new File(pictureSessionDir,
             "gif-" + System.currentTimeMillis() + ".gif");
         OutputStream os = null;
         ByteArrayOutputStream bos = null;
@@ -234,7 +247,7 @@ public class ShareGifActivity extends AppCompatActivity {
     mProgress.setVisibility(View.GONE);
     mTalkingToUser.setText("Gif processed");
     Log.d(TAG, "Gif processed");
-    mTakingPictureFab.show();
+    mShareToFbFab.show();
     Glide.with(this)
         .load(gifAbsolutePath)
         .into(mGifVisualization);
@@ -245,6 +258,33 @@ public class ShareGifActivity extends AppCompatActivity {
     options.inPreferredConfig = Bitmap.Config.ARGB_8888;
     Bitmap bitmap = BitmapFactory.decodeFile(nextPicPath.getAbsolutePath(), options);
     return bitmap;
+  }
+
+  private void shareGifToFb() {
+    Bundle params = new Bundle();
+
+    try {
+      FileInputStream in = new FileInputStream(gifFile.getAbsolutePath());
+      BufferedInputStream buf = new BufferedInputStream(in);
+      byte[] bMapArray= new byte[buf.available()];
+      buf.read(bMapArray);
+      params.putByteArray("source", bMapArray);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+/* make the API call */
+    new GraphRequest(
+        AccessToken.getCurrentAccessToken(),
+        "/a.10211351342553032.1073741827.1045097008/photos",
+        params,
+        HttpMethod.POST,
+        new GraphRequest.Callback() {
+          public void onCompleted(GraphResponse response) {
+        /* handle the result */
+        Toast.makeText(ShareGifActivity.this, "Added to fb album. Check fb group", Toast.LENGTH_SHORT).show();
+          }
+        }
+    ).executeAsync();
   }
 
 }
