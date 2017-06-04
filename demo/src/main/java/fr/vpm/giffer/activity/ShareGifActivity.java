@@ -36,25 +36,21 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
-import com.facebook.GraphRequest;
-import com.facebook.GraphResponse;
-import com.facebook.HttpMethod;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.google.android.giffer.giffer.R;
 import com.nbadal.gifencoder.AnimatedGifEncoder;
 
-import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+
+import fr.vpm.giffer.PostToFacebookAlbum;
 
 public class ShareGifActivity extends AppCompatActivity {
 
@@ -77,6 +73,7 @@ public class ShareGifActivity extends AppCompatActivity {
   private String gifFolderPath;
   private CallbackManager callbackManager;
   private File gifFile;
+  private PostToFacebookAlbum postToFacebookAlbum = new PostToFacebookAlbum();
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -88,7 +85,12 @@ public class ShareGifActivity extends AppCompatActivity {
     mShareToFbFab.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
-        shareGifToFb();
+        postToFacebookAlbum.shareGifToFb(ShareGifActivity.this.gifFile, new PostToFacebookAlbum.Listener() {
+          @Override
+          public void onPicturePublished() {
+            Toast.makeText(ShareGifActivity.this, "Gif uploaded to album", Toast.LENGTH_SHORT).show();
+          }
+        });
       }
     });
     mProgress = (ProgressBar) findViewById(R.id.gif_progress);
@@ -258,34 +260,6 @@ public class ShareGifActivity extends AppCompatActivity {
     options.inPreferredConfig = Bitmap.Config.ARGB_8888;
     Bitmap bitmap = BitmapFactory.decodeFile(nextPicPath.getAbsolutePath(), options);
     return bitmap;
-  }
-
-  private void shareGifToFb() {
-    Bundle params = new Bundle();
-
-    try {
-      FileInputStream in = new FileInputStream(gifFile.getAbsolutePath());
-      BufferedInputStream buf = new BufferedInputStream(in);
-      byte[] bMapArray= new byte[buf.available()];
-      buf.read(bMapArray);
-      params.putByteArray("source", bMapArray);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-/* make the API call */
-    new GraphRequest(
-        AccessToken.getCurrentAccessToken(),
-        "/10211351342553032/photos",
-        params,
-        HttpMethod.POST,
-        new GraphRequest.Callback() {
-          public void onCompleted(GraphResponse response) {
-        /* handle the result */
-            Log.d("ShareGifActivity", response.toString());
-        Toast.makeText(ShareGifActivity.this, "Added to fb album. Check fb group", Toast.LENGTH_SHORT).show();
-          }
-        }
-    ).executeAsync();
   }
 
 }
