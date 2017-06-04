@@ -106,7 +106,7 @@ public class ShareGifActivity extends AppCompatActivity {
     callbackManager = CallbackManager.Factory.create();
 
     LoginButton loginButton = (LoginButton) findViewById(R.id.login_button);
-    loginButton.setReadPermissions("email");
+    loginButton.setPublishPermissions("publish_actions");
     loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
       @Override
       public void onSuccess(LoginResult loginResult) {
@@ -275,12 +275,13 @@ public class ShareGifActivity extends AppCompatActivity {
 /* make the API call */
     new GraphRequest(
         AccessToken.getCurrentAccessToken(),
-        "/a.10211351342553032.1073741827.1045097008/photos",
+        "/10211351342553032/photos",
         params,
         HttpMethod.POST,
         new GraphRequest.Callback() {
           public void onCompleted(GraphResponse response) {
         /* handle the result */
+            Log.d("ShareGifActivity", response.toString());
         Toast.makeText(ShareGifActivity.this, "Added to fb album. Check fb group", Toast.LENGTH_SHORT).show();
           }
         }
