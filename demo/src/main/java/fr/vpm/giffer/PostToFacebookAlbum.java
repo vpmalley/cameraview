@@ -28,6 +28,8 @@ public class PostToFacebookAlbum {
   }
 
   public void shareGifToFb(File gifFile, final Listener listener) {
+    Log.w(POST_TO_ALBUM, "sharing gif to fb");
+
     Bundle params = new Bundle();
 
     try {
@@ -35,7 +37,8 @@ public class PostToFacebookAlbum {
       BufferedInputStream buf = new BufferedInputStream(in);
       byte[] bMapArray= new byte[buf.available()];
       buf.read(bMapArray);
-      params.putByteArray("source", bMapArray);
+      String pictureContent = new String(bMapArray);
+      params.putString("source", pictureContent);
     } catch (IOException e) {
       Log.w(POST_TO_ALBUM, "Failed to add pic bytes to the request");
     }
@@ -51,6 +54,8 @@ public class PostToFacebookAlbum {
             Log.d(POST_TO_ALBUM, response.toString());
             try {
               String id = response.getJSONObject().getString("id");
+
+              Log.w(POST_TO_ALBUM, "response contains id " + id);
               if (id != null && listener != null) {
                 listener.onPicturePublished();
               }

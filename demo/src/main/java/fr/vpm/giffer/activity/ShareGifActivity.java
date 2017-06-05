@@ -131,12 +131,16 @@ public class ShareGifActivity extends AppCompatActivity {
   }
 
   @Override
-  protected void onResume() {
-    super.onResume();
+  protected void onStart() {
+    super.onStart();
     if (mShareToFbFab != null) {
-      // mShareToFbFab.setOnClickListener();
       mShareToFbFab.hide();
     }
+  }
+
+  @Override
+  protected void onResume() {
+    super.onResume();
     if (mTalkingToUser != null) {
       mTalkingToUser.setText("Processing your pics");
     }
@@ -250,9 +254,9 @@ public class ShareGifActivity extends AppCompatActivity {
     mTalkingToUser.setText("Gif processed");
     Log.d(TAG, "Gif processed");
     mShareToFbFab.show();
-    Glide.with(this)
-        .load(gifAbsolutePath)
-        .into(mGifVisualization);
+//    Glide.with(this)
+//        .load(gifAbsolutePath)
+//        .into(mGifVisualization);
   }
 
   private Bitmap bitmapOf(File nextPicPath) {
