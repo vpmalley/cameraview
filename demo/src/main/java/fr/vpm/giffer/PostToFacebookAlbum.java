@@ -11,7 +11,6 @@ import com.facebook.HttpMethod;
 import org.json.JSONException;
 
 import java.io.BufferedInputStream;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
@@ -27,13 +26,13 @@ public class PostToFacebookAlbum {
     void onPicturePublished();
   }
 
-  public void shareGifToFb(File gifFile, final Listener listener) {
+  public void shareGifToFb(String gifFileAbsolutePath, final Listener listener) {
     Log.w(POST_TO_ALBUM, "sharing gif to fb");
 
     Bundle params = new Bundle();
 
     try {
-      FileInputStream in = new FileInputStream(gifFile.getAbsolutePath());
+      FileInputStream in = new FileInputStream(gifFileAbsolutePath);
       BufferedInputStream buf = new BufferedInputStream(in);
       byte[] bMapArray= new byte[buf.available()];
       buf.read(bMapArray);

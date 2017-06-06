@@ -44,6 +44,7 @@ import com.google.android.giffer.giffer.R;
 import java.io.File;
 
 import fr.vpm.giffer.CreateGif;
+import fr.vpm.giffer.CreateGif2;
 import fr.vpm.giffer.PostToFacebookAlbum;
 
 public class ShareGifActivity extends AppCompatActivity {
@@ -66,7 +67,7 @@ public class ShareGifActivity extends AppCompatActivity {
 
   private String gifFolderPath;
   private CallbackManager callbackManager;
-  private File gifFile;
+  private String gifFileAbsolutePath;
   private PostToFacebookAlbum postToFacebookAlbum = new PostToFacebookAlbum();
 
   @Override
@@ -79,7 +80,7 @@ public class ShareGifActivity extends AppCompatActivity {
     mShareToFbFab.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
-        postToFacebookAlbum.shareGifToFb(ShareGifActivity.this.gifFile, new PostToFacebookAlbum.Listener() {
+        postToFacebookAlbum.shareGifToFb(ShareGifActivity.this.gifFileAbsolutePath, new PostToFacebookAlbum.Listener() {
           @Override
           public void onPicturePublished() {
             Toast.makeText(ShareGifActivity.this, "Gif uploaded to album", Toast.LENGTH_SHORT).show();
@@ -185,7 +186,7 @@ public class ShareGifActivity extends AppCompatActivity {
   private void createGif(final String pictureSessionFolder) {
     File pictureSessionDir = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES),
         pictureSessionFolder);
-    new CreateGif().createGif(pictureSessionDir, getBackgroundHandler(), new CreateGif.Listener() {
+    new CreateGif2().createGif(pictureSessionDir, getBackgroundHandler(), new CreateGif.Listener() {
       @Override
       public void onGifCreated(final File gifFile) {
         mProgress.post(new Runnable() {
@@ -199,6 +200,7 @@ public class ShareGifActivity extends AppCompatActivity {
   }
 
   private void onGifProcessed(String gifAbsolutePath) {
+    this.gifFileAbsolutePath = gifAbsolutePath;
     mProgress.setVisibility(View.GONE);
     mTalkingToUser.setText("Gif processed");
     Log.d(TAG, "Gif processed");
