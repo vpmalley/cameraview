@@ -44,7 +44,8 @@ public class PostToFacebookAlbum {
 
     new GraphRequest(
         AccessToken.getCurrentAccessToken(),
-        "/10211351342553032/photos",
+       // "/10211351342553032/photos",
+        "/116200818975426/photos",
         params,
         HttpMethod.POST,
         new GraphRequest.Callback() {
@@ -54,7 +55,7 @@ public class PostToFacebookAlbum {
             try {
               String id = response.getJSONObject().getString("id");
 
-              Log.w(POST_TO_ALBUM, "response contains id " + id);
+              Log.d(POST_TO_ALBUM, "response contains id " + id);
               if (id != null && listener != null) {
                 listener.onPicturePublished();
               }

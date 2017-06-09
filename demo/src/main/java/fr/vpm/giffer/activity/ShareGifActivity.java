@@ -107,9 +107,7 @@ public class ShareGifActivity extends AppCompatActivity {
     loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
       @Override
       public void onSuccess(LoginResult loginResult) {
-        // App code
         Toast.makeText(ShareGifActivity.this, "You are logged in", Toast.LENGTH_SHORT).show();
-        // share picture
       }
 
       @Override
