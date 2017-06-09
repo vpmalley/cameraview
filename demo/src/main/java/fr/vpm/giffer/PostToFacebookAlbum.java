@@ -14,10 +14,6 @@ import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-/**
- * Created by vince on 04/06/17.
- */
-
 public class PostToFacebookAlbum {
 
   private static final String POST_TO_ALBUM = "PostToFacebookAlbum";
@@ -31,8 +27,9 @@ public class PostToFacebookAlbum {
 
     Bundle params = new Bundle();
 
+    FileInputStream in = null;
     try {
-      FileInputStream in = new FileInputStream(gifFileAbsolutePath);
+      in = new FileInputStream(gifFileAbsolutePath);
       BufferedInputStream buf = new BufferedInputStream(in);
       byte[] bMapArray= new byte[buf.available()];
       buf.read(bMapArray);
@@ -40,6 +37,13 @@ public class PostToFacebookAlbum {
       params.putString("source", pictureContent);
     } catch (IOException e) {
       Log.w(POST_TO_ALBUM, "Failed to add pic bytes to the request");
+    } finally {
+      if (in != null) {
+        try {
+          in.close();
+        } catch (IOException e) {
+        }
+      }
     }
 
     new GraphRequest(
@@ -53,11 +57,12 @@ public class PostToFacebookAlbum {
         /* handle the result */
             Log.d(POST_TO_ALBUM, response.toString());
             try {
-              String id = response.getJSONObject().getString("id");
-
-              Log.d(POST_TO_ALBUM, "response contains id " + id);
-              if (id != null && listener != null) {
-                listener.onPicturePublished();
+              if (response.getJSONObject() != null && response.getJSONObject().has("id")) {
+                String id = response.getJSONObject().getString("id");
+                Log.d(POST_TO_ALBUM, "response contains id " + id);
+                if (id != null && listener != null) {
+                  listener.onPicturePublished();
+                }
               }
             } catch (JSONException e) {
               Log.w(POST_TO_ALBUM, "response does not contain id");
