@@ -1,5 +1,7 @@
 package fr.vpm.giffer;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -9,10 +11,6 @@ import com.facebook.GraphResponse;
 import com.facebook.HttpMethod;
 
 import org.json.JSONException;
-
-import java.io.BufferedInputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
 
 public class PostToFacebookAlbum {
 
@@ -26,29 +24,12 @@ public class PostToFacebookAlbum {
     Log.w(POST_TO_ALBUM, "sharing gif to fb");
 
     Bundle params = new Bundle();
-
-    FileInputStream in = null;
-    try {
-      in = new FileInputStream(gifFileAbsolutePath);
-      BufferedInputStream buf = new BufferedInputStream(in);
-      byte[] bMapArray= new byte[buf.available()];
-      buf.read(bMapArray);
-      String pictureContent = new String(bMapArray);
-      params.putString("source", pictureContent);
-    } catch (IOException e) {
-      Log.w(POST_TO_ALBUM, "Failed to add pic bytes to the request");
-    } finally {
-      if (in != null) {
-        try {
-          in.close();
-        } catch (IOException e) {
-        }
-      }
-    }
+    Bitmap bitmap = BitmapFactory.decodeFile(gifFileAbsolutePath);
+    params.putParcelable("source", bitmap);
 
     new GraphRequest(
         AccessToken.getCurrentAccessToken(),
-       // "/10211351342553032/photos",
+        // "/10211351342553032/photos",
         "/116200818975426/photos",
         params,
         HttpMethod.POST,
