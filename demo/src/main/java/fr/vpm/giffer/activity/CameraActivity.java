@@ -211,6 +211,12 @@ public class CameraActivity extends AppCompatActivity implements
       ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA},
           REQUEST_CAMERA_PERMISSION);
     }
+    if (mTalkingToUser != null) {
+      mTalkingToUser.setText("");
+    }
+    if (mTakingPictureFab != null) {
+      mTakingPictureFab.show();
+    }
   }
 
   @Override

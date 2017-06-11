@@ -126,9 +126,6 @@ public class ShareGifActivity extends AppCompatActivity {
   @Override
   protected void onStart() {
     super.onStart();
-    if (mShareToFbFab != null) {
-      mShareToFbFab.hide();
-    }
   }
 
   @Override
@@ -146,6 +143,9 @@ public class ShareGifActivity extends AppCompatActivity {
           .into(mGifVisualization);
     }
     createGif(gifFolderPath);
+    if (mShareToFbFab != null) {
+      mShareToFbFab.hide();
+    }
   }
 
   @Override
