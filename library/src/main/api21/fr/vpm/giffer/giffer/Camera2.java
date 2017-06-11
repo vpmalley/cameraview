@@ -49,6 +49,7 @@ class Camera2 extends CameraViewImpl {
 
     private static final SparseIntArray INTERNAL_FACINGS = new SparseIntArray();
     public static final int EXPOSITION_DURATION = 1000;
+    public static final int MAX_SIZE = 2500;
 
     static {
         INTERNAL_FACINGS.put(Constants.FACING_BACK, CameraCharacteristics.LENS_FACING_BACK);
@@ -441,7 +442,11 @@ class Camera2 extends CameraViewImpl {
 
     protected void collectPictureSizes(SizeMap sizes, StreamConfigurationMap map) {
         for (android.util.Size size : map.getOutputSizes(ImageFormat.JPEG)) {
-            mPictureSizes.add(new Size(size.getWidth(), size.getHeight()));
+            if (size.getWidth() < MAX_SIZE && size.getHeight() < MAX_SIZE) {
+                Size newSize = new Size(size.getWidth(), size.getHeight());
+                mPictureSizes.add(newSize);
+                Log.d("pictureSizes", newSize.toString());
+            }
         }
     }
 
