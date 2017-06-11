@@ -44,7 +44,7 @@ import com.google.android.giffer.giffer.R;
 import java.io.File;
 
 import fr.vpm.giffer.CreateGif;
-import fr.vpm.giffer.CreateGif2;
+import fr.vpm.giffer.CreateGif1;
 import fr.vpm.giffer.PostToFacebookAlbum;
 
 public class ShareGifActivity extends AppCompatActivity {
@@ -184,7 +184,7 @@ public class ShareGifActivity extends AppCompatActivity {
   private void createGif(final String pictureSessionFolder) {
     File pictureSessionDir = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES),
         pictureSessionFolder);
-    new CreateGif2().createGif(pictureSessionDir, getBackgroundHandler(), new CreateGif.Listener() {
+    new CreateGif1().createGif(pictureSessionDir, getBackgroundHandler(), new CreateGif.Listener() {
       @Override
       public void onGifCreated(final File gifFile) {
         mProgress.post(new Runnable() {

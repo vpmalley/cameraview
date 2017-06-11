@@ -19,7 +19,6 @@ package com.google.android.giffer;
 import android.app.Activity;
 import android.os.Bundle;
 
-import com.google.android.giffer.test.R;
 
 public class CameraViewActivity extends Activity {
 
