@@ -46,6 +46,7 @@ import java.io.File;
 import fr.vpm.giffer.CreateGif;
 import fr.vpm.giffer.CreateGif1;
 import fr.vpm.giffer.PostToFacebookAlbum;
+import fr.vpm.giffer.PostToTumblrBlog;
 
 public class ShareGifActivity extends AppCompatActivity {
 
@@ -69,6 +70,7 @@ public class ShareGifActivity extends AppCompatActivity {
   private CallbackManager callbackManager;
   private String gifFileAbsolutePath;
   private PostToFacebookAlbum postToFacebookAlbum = new PostToFacebookAlbum();
+  private PostToTumblrBlog postToTumblr = new PostToTumblrBlog();
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -80,12 +82,13 @@ public class ShareGifActivity extends AppCompatActivity {
     mShareToFbFab.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
-        postToFacebookAlbum.shareGifToFb(ShareGifActivity.this.gifFileAbsolutePath, new PostToFacebookAlbum.Listener() {
-          @Override
-          public void onPicturePublished() {
-            Toast.makeText(ShareGifActivity.this, "Gif uploaded to album", Toast.LENGTH_SHORT).show();
-          }
-        });
+//        postToFacebookAlbum.shareGifToFb(ShareGifActivity.this.gifFileAbsolutePath, new PostToFacebookAlbum.Listener() {
+//          @Override
+//          public void onPicturePublished() {
+//            Toast.makeText(ShareGifActivity.this, "Gif uploaded to album", Toast.LENGTH_SHORT).show();
+//          }
+//        });
+        postToTumblr.post(getResources(), new File(ShareGifActivity.this.gifFileAbsolutePath));
       }
     });
     mProgress = (ProgressBar) findViewById(R.id.gif_progress);
