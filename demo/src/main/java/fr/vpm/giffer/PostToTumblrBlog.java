@@ -7,14 +7,11 @@ import android.util.Log;
 import com.github.scribejava.apis.TumblrApi;
 import com.github.scribejava.core.builder.ServiceBuilder;
 import com.github.scribejava.core.model.OAuth1AccessToken;
-import com.github.scribejava.core.model.OAuth1RequestToken;
 import com.github.scribejava.core.oauth.OAuth10aService;
 import com.google.android.giffer.giffer.R;
 import com.tumblr.jumblr.JumblrClient;
-import com.tumblr.jumblr.types.PhotoPost;
 
 import java.io.File;
-import java.io.IOException;
 
 
 /**
@@ -31,29 +28,29 @@ public class PostToTumblrBlog {
     return service;
   }
 
-  public void post(Resources resources, File file) {
+  public void post(final Resources resources, final File file) {
     OAuth10aService service = getService(resources);
-    OAuth1AccessToken oAuthToken = getOAuthToken(service);
+    new AsyncGetOAuthToken(service, new AsyncGetOAuthToken.Listener() {
+      @Override
+      public void onOAuthTokenRetrieved(OAuth1AccessToken token) {
+        postWithToken(resources, file, token);
+      }
+    }).execute();
+  }
+
+  private void postWithToken(Resources resources, File file, OAuth1AccessToken oAuthToken) {
     if (oAuthToken != null) {
       Log.i("POST-PHOTO", "failed posting the picture to the blog");
       return;
     }
     JumblrClient client = getJumblrClient(resources, oAuthToken);
 
-    PhotoPost post;
-    try {
-      post = client.newPost("vincetraveller", PhotoPost.class);
-      post.setCaption("some gif");
-      post.setData(file);
-      post.save();
-      Log.i("POST-PHOTO", "posted the picture to the blog");
-    } catch (IllegalAccessException e) {
-      Log.w("POST-PHOTO", e);
-    } catch (InstantiationException e) {
-      Log.w("POST-PHOTO", e);
-    } catch (IOException e) {
-      Log.w("POST-PHOTO", e);
-    }
+    new AsyncPostToTumblr(client, new AsyncPostToTumblr.Listener() {
+      @Override
+      public void onPosted() {
+
+      }
+    }).execute(file);
   }
 
   @NonNull
@@ -62,17 +59,6 @@ public class PostToTumblrBlog {
         resources.getString(R.string.tumblr_consumer_secret));
     jumblrClient.setToken(oAuthToken.getToken(), oAuthToken.getTokenSecret());
     return jumblrClient;
-  }
-
-  private OAuth1AccessToken getOAuthToken(OAuth10aService service) {
-    try {
-      final OAuth1RequestToken requestToken = service.getRequestToken();
-      final String authUrl = service.getAuthorizationUrl(requestToken);
-      return service.getAccessToken(requestToken, "verifier you got from the user/callback");
-    } catch (IOException e) {
-      Log.w("GET-OAUTH-TOKEN", e);
-    }
-    return null;
   }
 
 }
