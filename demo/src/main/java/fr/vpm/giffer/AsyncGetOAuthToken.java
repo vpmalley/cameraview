@@ -13,7 +13,7 @@ import java.io.IOException;
  * Created by vince on 22/06/17.
  */
 
-class AsyncGetOAuthToken extends AsyncTask<String, Integer, OAuth1AccessToken> {
+class AsyncGetOAuthToken extends AsyncTask<Object, Integer, OAuth1AccessToken> {
 
   interface Listener {
     void onOAuthTokenRetrieved(OAuth1AccessToken token);
@@ -29,11 +29,11 @@ class AsyncGetOAuthToken extends AsyncTask<String, Integer, OAuth1AccessToken> {
   }
 
   @Override
-  protected OAuth1AccessToken doInBackground(String... strings) {
+  protected OAuth1AccessToken doInBackground(Object... params) {
+    final OAuth1RequestToken requestToken = (OAuth1RequestToken) params[0];
+    final String verifier = (String) params[1];
     try {
-      final OAuth1RequestToken requestToken = service.getRequestToken();
-      final String authUrl = service.getAuthorizationUrl(requestToken);
-      return service.getAccessToken(requestToken, "verifier you got from the user/callback");
+      return service.getAccessToken(requestToken, verifier);
     } catch (IOException e) {
       Log.w("GET-OAUTH-TOKEN", e);
     }
