@@ -88,7 +88,7 @@ public class ShareGifActivity extends AppCompatActivity {
 //            Toast.makeText(ShareGifActivity.this, "Gif uploaded to album", Toast.LENGTH_SHORT).show();
 //          }
 //        });
-        postToTumblr.post(ShareGifActivity.this, new File(ShareGifActivity.this.gifFileAbsolutePath));
+        postToTumblr.post(ShareGifActivity.this, getBackgroundHandler(), new File(ShareGifActivity.this.gifFileAbsolutePath));
       }
     });
     mProgress = (ProgressBar) findViewById(R.id.gif_progress);

@@ -3,6 +3,7 @@ package fr.vpm.giffer;
 import android.content.Context;
 import android.content.res.Resources;
 import android.net.Uri;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.customtabs.CustomTabsIntent;
 import android.util.Log;
@@ -16,11 +17,7 @@ import com.google.android.giffer.giffer.R;
 import com.tumblr.jumblr.JumblrClient;
 
 import java.io.File;
-
-
-/**
- * Created by vince on 15/06/17.
- */
+import java.io.IOException;
 
 public class PostToTumblrBlog {
 
@@ -38,19 +35,29 @@ public class PostToTumblrBlog {
     return service;
   }
 
-  public void post(final Context context, final File file) {
+  public void post(final Context context, Handler backgroundHandler, final File file) {
+    Log.d("POST-PHOTO", "start posting");
     this.context = context;
     this.fileToPost = file;
     service = getService(context.getResources());
-    new AsyncGetRequestToken(service, new AsyncGetRequestToken.Listener() {
+    backgroundHandler.post(new Runnable() {
       @Override
-      public void onOAuthTokenRetrieved(OAuth1RequestToken token) {
-        authorize(token);
+      public void run() {
+        OAuth1RequestToken requestToken = null;
+        try {
+          requestToken = service.getRequestToken();
+        } catch (IOException e) {
+          Log.w("GET-OAUTH-TOKEN", e);
+        }
+        if (requestToken != null) {
+          authorize(requestToken);
+        }
       }
     });
   }
 
   private void authorize(OAuth1RequestToken oAuth1RequestToken) {
+    Log.d("POST-PHOTO", "start authorizing");
     String authorizationUrl = service.getAuthorizationUrl(oAuth1RequestToken);
     CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
     CustomTabsIntent customTabsIntent = builder.build();
@@ -58,6 +65,7 @@ public class PostToTumblrBlog {
   }
 
   private void getOAuthToken(String verifier) {
+    Log.d("POST-PHOTO", "start getting token with verifier");
     new AsyncGetOAuthToken(service, new AsyncGetOAuthToken.Listener() {
       @Override
       public void onOAuthTokenRetrieved(OAuth1AccessToken token) {
@@ -67,6 +75,7 @@ public class PostToTumblrBlog {
   }
 
   private void postWithToken(OAuth1AccessToken oAuthToken) {
+    Log.d("POST-PHOTO", "start posting with token");
     if (oAuthToken != null) {
       Log.i("POST-PHOTO", "failed posting the picture to the blog");
       return;
@@ -76,7 +85,7 @@ public class PostToTumblrBlog {
     new AsyncPostToTumblr(client, new AsyncPostToTumblr.Listener() {
       @Override
       public void onPosted() {
-
+        Log.d("POST-PHOTO", "posted photo");
       }
     }).execute(fileToPost);
   }
