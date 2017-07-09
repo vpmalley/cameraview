@@ -31,6 +31,7 @@ public class PostToTumblrBlog {
     final OAuth10aService service = new ServiceBuilder()
         .apiKey(resources.getString(R.string.tumblr_consumer_key))
         .apiSecret(resources.getString(R.string.tumblr_consumer_secret))
+        .callback("vpmgiffer://loginok")
         .build(TumblrApi.instance());
     return service;
   }

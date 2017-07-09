@@ -33,7 +33,12 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="fr.vpm.giffer.activity.ShareGifActivity" />
+        <activity android:name="fr.vpm.giffer.activity.ShareGifActivity" >
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <data android:scheme="vpmgiffer" android:host="loginok" />
+            </intent-filter>
+        </activity>
 
         <activity android:name="com.facebook.FacebookActivity"
                   android:configChanges=
