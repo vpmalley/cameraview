@@ -75,6 +75,7 @@ public class ShareGifActivity extends AppCompatActivity {
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    Log.d("SHARE-GIF", "onCreate");
     setContentView(R.layout.activity_share_gif);
     mGifVisualization = (ImageView) findViewById(R.id.gif);
     mTalkingToUser = (TextView) findViewById(R.id.talkingToUser);
@@ -172,6 +173,7 @@ public class ShareGifActivity extends AppCompatActivity {
   @Override
   protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     super.onActivityResult(requestCode, resultCode, data);
+    Log.d("SHARE-GIF", "onActivityResult with " + requestCode + " " + resultCode);
     callbackManager.onActivityResult(requestCode, resultCode, data);
   }
 

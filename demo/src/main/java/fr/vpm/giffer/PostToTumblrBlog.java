@@ -65,14 +65,14 @@ public class PostToTumblrBlog {
     customTabsIntent.launchUrl(context, Uri.parse(authorizationUrl));
   }
 
-  private void getOAuthToken(String verifier) {
+  private void getOAuthToken(OAuth1RequestToken oAuth1RequestToken, String verifier) {
     Log.d("POST-PHOTO", "start getting token with verifier");
     new AsyncGetOAuthToken(service, new AsyncGetOAuthToken.Listener() {
       @Override
       public void onOAuthTokenRetrieved(OAuth1AccessToken token) {
         postWithToken(token);
       }
-    }).execute();
+    }).execute(oAuth1RequestToken, verifier);
   }
 
   private void postWithToken(OAuth1AccessToken oAuthToken) {
