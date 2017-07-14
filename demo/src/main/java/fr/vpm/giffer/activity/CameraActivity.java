@@ -21,6 +21,7 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -56,6 +57,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import fr.vpm.giffer.PostToTumblrBlog;
+
 /**
  * This demo app saves the taken picture to a constant file.
  * $ adb pull /sdcard/Android/data/com.google.android.cameraview.demo/files/Pictures/picture.jpg
@@ -79,11 +82,19 @@ public class CameraActivity extends AppCompatActivity implements
 
   private ProgressBar mProgress;
 
+  private PostToTumblrBlog postToTumblr;
+  private String mPictureSessionFolder;
   private View.OnClickListener mOnClickListener = new View.OnClickListener() {
     @Override
     public void onClick(View v) {
       switch (v.getId()) {
         case R.id.take_picture:
+          if (!postToTumblr.hasAccessToken()) {
+            Log.d("CameraA", "authenticating");
+            postToTumblr.authenticate(getBackgroundHandler());
+            return;
+          }
+          Log.d("CameraA", "taking pics");
           if (mCameraView != null) {
             mTakingPictureFab.hide();
             mPictureSessionFolder = new SimpleDateFormat("yyyyMMdd-HHmmss", Locale.FRANCE).format(new Date());
@@ -106,7 +117,6 @@ public class CameraActivity extends AppCompatActivity implements
       }
     }
   };
-  private String mPictureSessionFolder;
   private CameraView.Callback mCallback
       = new CameraView.Callback() {
 
@@ -175,6 +185,7 @@ public class CameraActivity extends AppCompatActivity implements
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_camera);
+    postToTumblr = new PostToTumblrBlog(this);
     mCameraView = (CameraView) findViewById(R.id.camera);
     if (mCameraView != null) {
       mCameraView.addCallback(mCallback);
@@ -190,6 +201,13 @@ public class CameraActivity extends AppCompatActivity implements
     ActionBar actionBar = getSupportActionBar();
     if (actionBar != null) {
       actionBar.setDisplayShowTitleEnabled(false);
+    }
+    Intent intent = getIntent();
+    if ((intent != null) && (intent.getData() != null)) {
+      Uri uri = intent.getData();
+      String oauthVerifier = uri.getQueryParameter("oauth_verifier");
+      Log.d("POST-PHOTO", oauthVerifier);
+      postToTumblr.getOAuthToken(oauthVerifier);
     }
   }
 

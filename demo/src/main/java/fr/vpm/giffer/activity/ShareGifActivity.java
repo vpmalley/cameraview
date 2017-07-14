@@ -70,13 +70,14 @@ public class ShareGifActivity extends AppCompatActivity {
   private CallbackManager callbackManager;
   private String gifFileAbsolutePath;
   private PostToFacebookAlbum postToFacebookAlbum = new PostToFacebookAlbum();
-  private PostToTumblrBlog postToTumblr = new PostToTumblrBlog();
+  private PostToTumblrBlog postToTumblr;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     Log.d("SHARE-GIF", "onCreate");
     setContentView(R.layout.activity_share_gif);
+    postToTumblr = new PostToTumblrBlog(this);
     mGifVisualization = (ImageView) findViewById(R.id.gif);
     mTalkingToUser = (TextView) findViewById(R.id.talkingToUser);
     mShareToFbFab = (FloatingActionButton) findViewById(R.id.share_picture);
@@ -89,7 +90,7 @@ public class ShareGifActivity extends AppCompatActivity {
 //            Toast.makeText(ShareGifActivity.this, "Gif uploaded to album", Toast.LENGTH_SHORT).show();
 //          }
 //        });
-        postToTumblr.post(ShareGifActivity.this, getBackgroundHandler(), new File(ShareGifActivity.this.gifFileAbsolutePath));
+        postToTumblr.post(new File(ShareGifActivity.this.gifFileAbsolutePath));
       }
     });
     mProgress = (ProgressBar) findViewById(R.id.gif_progress);

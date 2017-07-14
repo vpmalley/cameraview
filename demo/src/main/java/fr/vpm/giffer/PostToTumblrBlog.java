@@ -26,7 +26,9 @@ public class PostToTumblrBlog {
 
   private Context context;
 
-  private File fileToPost;
+  public PostToTumblrBlog(Context context) {
+    this.context = context;
+  }
 
   private OAuth10aService getService(Resources resources) {
     final OAuth10aService service = new ServiceBuilder()
@@ -37,10 +39,8 @@ public class PostToTumblrBlog {
     return service;
   }
 
-  public void post(final Context context, Handler backgroundHandler, final File file) {
-    Log.d("POST-PHOTO", "start posting");
-    this.context = context;
-    this.fileToPost = file;
+  public void authenticate(Handler backgroundHandler) {
+    Log.d("GET-OAUTH-TOKEN", "start authenticating");
     service = getService(context.getResources());
     backgroundHandler.post(new Runnable() {
       @Override
@@ -62,10 +62,28 @@ public class PostToTumblrBlog {
         }
       }
     });
+
+  }
+
+  public void post(final File file) {
+    Log.d("POST-PHOTO", "start posting");
+    SharedPreferences sharedPref = context.getSharedPreferences(
+        context.getString(R.string.oauth_preference_file_key), Context.MODE_PRIVATE);
+    String oAuthToken = sharedPref.getString("at", null);
+    String oAuthTokenSecret = sharedPref.getString("ats", null);
+    OAuth1AccessToken oAuth1AccessToken = new OAuth1AccessToken(oAuthToken, oAuthTokenSecret);
+    JumblrClient client = getJumblrClient(oAuth1AccessToken);
+
+    new AsyncPostToTumblr(client, new AsyncPostToTumblr.Listener() {
+      @Override
+      public void onPosted() {
+        Log.d("POST-PHOTO", "posted photo");
+      }
+    }).execute(file);
   }
 
   private void authorize(OAuth1RequestToken oAuth1RequestToken) {
-    Log.d("POST-PHOTO", "start authorizing");
+    Log.d("GET-OAUTH-TOKEN", "start authorizing");
     String authorizationUrl = service.getAuthorizationUrl(oAuth1RequestToken);
 
     Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(authorizationUrl));
@@ -73,11 +91,12 @@ public class PostToTumblrBlog {
   }
 
   public void getOAuthToken(String verifier) {
-    Log.d("POST-PHOTO", "start getting token with verifier");
+    Log.d("GET-OAUTH-TOKEN", "start getting token with verifier");
     SharedPreferences sharedPref = context.getSharedPreferences(
         context.getString(R.string.oauth_preference_file_key), Context.MODE_PRIVATE);
     String requestToken = sharedPref.getString("rt", null);
     String requestTokenSecret = sharedPref.getString("rts", null);
+    service = getService(context.getResources());
     OAuth1RequestToken oAuth1RequestToken = new OAuth1RequestToken(requestToken, requestTokenSecret);
     new AsyncGetOAuthToken(service, new AsyncGetOAuthToken.Listener() {
       @Override
@@ -88,25 +107,8 @@ public class PostToTumblrBlog {
         edition.putString("at", token.getToken());
         edition.putString("ats", token.getTokenSecret());
         edition.apply();
-        postWithToken(token);
       }
     }).execute(oAuth1RequestToken, verifier);
-  }
-
-  private void postWithToken(OAuth1AccessToken oAuthToken) {
-    Log.d("POST-PHOTO", "start posting with token");
-    if (oAuthToken != null) {
-      Log.i("POST-PHOTO", "failed posting the picture to the blog");
-      return;
-    }
-    JumblrClient client = getJumblrClient(oAuthToken);
-
-//    new AsyncPostToTumblr(client, new AsyncPostToTumblr.Listener() {
-//      @Override
-//      public void onPosted() {
-//        Log.d("POST-PHOTO", "posted photo");
-//      }
-//    }).execute(fileToPost);
   }
 
   @NonNull
@@ -117,4 +119,9 @@ public class PostToTumblrBlog {
     return jumblrClient;
   }
 
+  public boolean hasAccessToken() {
+    SharedPreferences sharedPref = context.getSharedPreferences(
+        context.getString(R.string.oauth_preference_file_key), Context.MODE_PRIVATE);
+    return sharedPref.contains("at");
+  }
 }

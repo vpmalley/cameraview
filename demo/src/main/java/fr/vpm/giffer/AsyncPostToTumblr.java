@@ -15,12 +15,7 @@ import java.io.IOException;
 
 class AsyncPostToTumblr extends AsyncTask<File, Integer, Boolean> {
 
-  interface Listener {
-    void onPosted();
-  }
-
   private final JumblrClient client;
-
   private final Listener listener;
 
   AsyncPostToTumblr(JumblrClient client, Listener listener) {
@@ -38,11 +33,7 @@ class AsyncPostToTumblr extends AsyncTask<File, Integer, Boolean> {
       post.save();
       Log.i("POST-PHOTO", "posted the picture to the blog");
       return true;
-    } catch (IllegalAccessException e) {
-      Log.w("POST-PHOTO", e);
-    } catch (InstantiationException e) {
-      Log.w("POST-PHOTO", e);
-    } catch (IOException e) {
+    } catch (IllegalAccessException | InstantiationException | IOException e) {
       Log.w("POST-PHOTO", e);
     }
     return false;
@@ -54,5 +45,9 @@ class AsyncPostToTumblr extends AsyncTask<File, Integer, Boolean> {
     if (isPosted) {
       listener.onPosted();
     }
+  }
+
+  interface Listener {
+    void onPosted();
   }
 }
