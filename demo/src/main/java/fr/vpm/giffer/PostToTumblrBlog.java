@@ -1,11 +1,12 @@
 package fr.vpm.giffer;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Handler;
 import android.support.annotation.NonNull;
-import android.support.customtabs.CustomTabsIntent;
 import android.util.Log;
 
 import com.github.scribejava.apis.TumblrApi;
@@ -51,6 +52,12 @@ public class PostToTumblrBlog {
           Log.w("GET-OAUTH-TOKEN", e);
         }
         if (requestToken != null) {
+          SharedPreferences sharedPref = context.getSharedPreferences(
+              context.getString(R.string.oauth_preference_file_key), Context.MODE_PRIVATE);
+          SharedPreferences.Editor edition = sharedPref.edit();
+          edition.putString("rt", requestToken.getToken());
+          edition.putString("rts", requestToken.getTokenSecret());
+          edition.apply();
           authorize(requestToken);
         }
       }
@@ -60,16 +67,27 @@ public class PostToTumblrBlog {
   private void authorize(OAuth1RequestToken oAuth1RequestToken) {
     Log.d("POST-PHOTO", "start authorizing");
     String authorizationUrl = service.getAuthorizationUrl(oAuth1RequestToken);
-    CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
-    CustomTabsIntent customTabsIntent = builder.build();
-    customTabsIntent.launchUrl(context, Uri.parse(authorizationUrl));
+
+    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(authorizationUrl));
+    context.startActivity(browserIntent);
   }
 
-  private void getOAuthToken(OAuth1RequestToken oAuth1RequestToken, String verifier) {
+  public void getOAuthToken(String verifier) {
     Log.d("POST-PHOTO", "start getting token with verifier");
+    SharedPreferences sharedPref = context.getSharedPreferences(
+        context.getString(R.string.oauth_preference_file_key), Context.MODE_PRIVATE);
+    String requestToken = sharedPref.getString("rt", null);
+    String requestTokenSecret = sharedPref.getString("rts", null);
+    OAuth1RequestToken oAuth1RequestToken = new OAuth1RequestToken(requestToken, requestTokenSecret);
     new AsyncGetOAuthToken(service, new AsyncGetOAuthToken.Listener() {
       @Override
       public void onOAuthTokenRetrieved(OAuth1AccessToken token) {
+        SharedPreferences sharedPref = context.getSharedPreferences(
+            context.getString(R.string.oauth_preference_file_key), Context.MODE_PRIVATE);
+        SharedPreferences.Editor edition = sharedPref.edit();
+        edition.putString("at", token.getToken());
+        edition.putString("ats", token.getTokenSecret());
+        edition.apply();
         postWithToken(token);
       }
     }).execute(oAuth1RequestToken, verifier);
@@ -83,12 +101,12 @@ public class PostToTumblrBlog {
     }
     JumblrClient client = getJumblrClient(oAuthToken);
 
-    new AsyncPostToTumblr(client, new AsyncPostToTumblr.Listener() {
-      @Override
-      public void onPosted() {
-        Log.d("POST-PHOTO", "posted photo");
-      }
-    }).execute(fileToPost);
+//    new AsyncPostToTumblr(client, new AsyncPostToTumblr.Listener() {
+//      @Override
+//      public void onPosted() {
+//        Log.d("POST-PHOTO", "posted photo");
+//      }
+//    }).execute(fileToPost);
   }
 
   @NonNull
