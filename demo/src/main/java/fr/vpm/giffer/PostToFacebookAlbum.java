@@ -1,7 +1,5 @@
 package fr.vpm.giffer;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -16,21 +14,19 @@ public class PostToFacebookAlbum {
 
   private static final String POST_TO_ALBUM = "PostToFacebookAlbum";
 
-  public interface Listener {
-    void onPicturePublished();
-  }
-
   public void shareGifToFb(String gifFileAbsolutePath, final Listener listener) {
     Log.w(POST_TO_ALBUM, "sharing gif to fb");
 
     Bundle params = new Bundle();
-    Bitmap bitmap = BitmapFactory.decodeFile(gifFileAbsolutePath);
-    params.putParcelable("source", bitmap);
+    //Bitmap bitmap = BitmapFactory.decodeFile(gifFileAbsolutePath);
+    params.putString("link", "http://vpmalley.github.io/images/gif-1500039805805.gif");
+    params.putBoolean("is_hidden", true);
 
     new GraphRequest(
         AccessToken.getCurrentAccessToken(),
-        // "/10211351342553032/photos",
-        "/116200818975426/photos",
+        "/" + AccessToken.getCurrentAccessToken().getUserId() + "/feed",
+        //"/10211351342553032/photos",
+        //"/116200818975426/photos",
         params,
         HttpMethod.POST,
         new GraphRequest.Callback() {
@@ -51,5 +47,9 @@ public class PostToFacebookAlbum {
           }
         }
     ).executeAsync();
+  }
+
+  public interface Listener {
+    void onPicturePublished();
   }
 }
