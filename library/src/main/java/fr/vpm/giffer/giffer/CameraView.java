@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.giffer;
+package fr.vpm.giffer.giffer;
 
 import android.app.Activity;
 import android.content.Context;
@@ -35,6 +35,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.Set;
+
 
 public class CameraView extends FrameLayout {
 

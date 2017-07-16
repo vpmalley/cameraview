@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.giffer;
+package fr.vpm.giffer.giffer;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -48,8 +48,8 @@ class Camera2 extends CameraViewImpl {
     private static final String TAG = "Camera2";
 
     private static final SparseIntArray INTERNAL_FACINGS = new SparseIntArray();
-    public static final int EXPOSITION_DURATION = 1000;
-    public static final int MAX_SIZE = 1500;
+    private static final int EXPOSITION_DURATION = 3000;
+    private static final int MAX_SIZE = 1800;
 
     static {
         INTERNAL_FACINGS.put(Constants.FACING_BACK, CameraCharacteristics.LENS_FACING_BACK);

@@ -17,9 +17,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@color/primary"
-                tools:context=".CameraActivity">
+                tools:context=".activity.CameraActivity">
 
-    <com.google.android.giffer.CameraView
+    <fr.vpm.giffer.giffer.CameraView
         android:id="@+id/camera"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.giffer;
+package fr.vpm.giffer.giffer;
 
 import android.content.Context;
 import android.support.v4.view.ViewCompat;

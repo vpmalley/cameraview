@@ -39,7 +39,6 @@ import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
-import com.google.android.giffer.giffer.R;
 
 import java.io.File;
 
@@ -48,6 +47,7 @@ import fr.vpm.giffer.CreateGif1;
 import fr.vpm.giffer.CreateGifAsVideo;
 import fr.vpm.giffer.PostToFacebookAlbum;
 import fr.vpm.giffer.PostToTumblrBlog;
+import fr.vpm.giffer.R;
 
 public class ShareGifActivity extends AppCompatActivity {
 

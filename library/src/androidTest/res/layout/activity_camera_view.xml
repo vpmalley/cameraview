@@ -16,7 +16,7 @@
              android:layout_width="match_parent"
              android:layout_height="match_parent">
 
-    <com.google.android.giffer.CameraView
+    <fr.vpm.giffer.giffer.CameraView
         android:id="@+id/camera"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

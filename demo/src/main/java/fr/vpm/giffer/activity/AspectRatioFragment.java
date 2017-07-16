@@ -29,10 +29,11 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import com.google.android.giffer.AspectRatio;
 
 import java.util.Arrays;
 import java.util.Set;
+
+import fr.vpm.giffer.giffer.AspectRatio;
 
 
 /**

@@ -46,8 +46,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.giffer.CameraView;
-import com.google.android.giffer.giffer.R;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -58,6 +56,8 @@ import java.util.Date;
 import java.util.Locale;
 
 import fr.vpm.giffer.PostToTumblrBlog;
+import fr.vpm.giffer.R;
+import fr.vpm.giffer.giffer.CameraView;
 
 /**
  * This demo app saves the taken picture to a constant file.

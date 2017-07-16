@@ -14,25 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.giffer;
-
-import static android.support.test.espresso.Espresso.onView;
-import static android.support.test.espresso.Espresso.registerIdlingResources;
-import static android.support.test.espresso.Espresso.unregisterIdlingResources;
-import static android.support.test.espresso.assertion.ViewAssertions.matches;
-import static android.support.test.espresso.matcher.ViewMatchers.assertThat;
-import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
-import static android.support.test.espresso.matcher.ViewMatchers.withId;
-
-import static com.google.android.giffer.AspectRatioIsCloseTo.closeToOrInverse;
-import static com.google.android.giffer.CameraViewActions.setAspectRatio;
-import static com.google.android.giffer.CameraViewMatchers.hasAspectRatio;
-
-import static junit.framework.Assert.assertFalse;
-
-import static org.hamcrest.CoreMatchers.hasItem;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
+package fr.vpm.giffer.giffer;
 
 import android.graphics.Bitmap;
 import android.os.SystemClock;
@@ -48,8 +30,6 @@ import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.android.giffer.test.R;
-
 import org.hamcrest.Matcher;
 import org.hamcrest.core.IsAnything;
 import org.junit.After;
@@ -61,6 +41,16 @@ import org.junit.runner.RunWith;
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.Set;
+
+import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.Espresso.registerIdlingResources;
+import static android.support.test.espresso.Espresso.unregisterIdlingResources;
+import static android.support.test.espresso.assertion.ViewAssertions.matches;
+import static android.support.test.espresso.matcher.ViewMatchers.assertThat;
+import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static android.support.test.espresso.matcher.ViewMatchers.withId;
+import static junit.framework.Assert.assertFalse;
+import static org.hamcrest.CoreMatchers.is;
 
 @RunWith(AndroidJUnit4.class)
 public class CameraViewTest {

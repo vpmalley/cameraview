@@ -14,7 +14,6 @@ import com.github.scribejava.core.builder.ServiceBuilder;
 import com.github.scribejava.core.model.OAuth1AccessToken;
 import com.github.scribejava.core.model.OAuth1RequestToken;
 import com.github.scribejava.core.oauth.OAuth10aService;
-import com.google.android.giffer.giffer.R;
 import com.tumblr.jumblr.JumblrClient;
 
 import java.io.File;

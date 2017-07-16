@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.giffer;
+package fr.vpm.giffer.giffer;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
