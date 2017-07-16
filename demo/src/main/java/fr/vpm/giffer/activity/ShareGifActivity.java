@@ -85,13 +85,13 @@ public class ShareGifActivity extends AppCompatActivity {
     mShareToFbFab.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
-//        postToFacebookAlbum.shareGifToFb(ShareGifActivity.this.gifFileAbsolutePath, new PostToFacebookAlbum.Listener() {
-//          @Override
-//          public void onPicturePublished() {
-//            Toast.makeText(ShareGifActivity.this, "Gif uploaded to album", Toast.LENGTH_SHORT).show();
-//          }
-//        });
-        postToTumblr.post(new File(ShareGifActivity.this.gifFileAbsolutePath));
+        postToFacebookAlbum.shareGifToFb(ShareGifActivity.this.gifFileAbsolutePath, ShareGifActivity.this, new PostToFacebookAlbum.Listener() {
+          @Override
+          public void onPicturePublished() {
+            Toast.makeText(ShareGifActivity.this, "Gif uploaded to album", Toast.LENGTH_SHORT).show();
+          }
+        });
+        //postToTumblr.post(new File(ShareGifActivity.this.gifFileAbsolutePath));
       }
     });
     mProgress = (ProgressBar) findViewById(R.id.gif_progress);
