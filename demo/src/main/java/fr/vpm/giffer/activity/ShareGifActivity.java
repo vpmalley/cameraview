@@ -19,7 +19,6 @@ package fr.vpm.giffer.activity;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.design.widget.FloatingActionButton;
@@ -43,8 +42,8 @@ import com.facebook.login.widget.LoginButton;
 import java.io.File;
 
 import fr.vpm.giffer.CreateGif;
-import fr.vpm.giffer.CreateGif1;
 import fr.vpm.giffer.CreateGifAsVideo;
+import fr.vpm.giffer.PicturesDirectory;
 import fr.vpm.giffer.PostToFacebookAlbum;
 import fr.vpm.giffer.PostToTumblrBlog;
 import fr.vpm.giffer.R;
@@ -140,9 +139,8 @@ public class ShareGifActivity extends AppCompatActivity {
     if (mTalkingToUser != null) {
       mTalkingToUser.setText("Processing your pics");
     }
-    File externalFilesDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-    File picturesSessionDir = new File(externalFilesDir, gifFolderPath);
-    File[] files = picturesSessionDir.listFiles();
+    File pictureSessionDir = PicturesDirectory.get(gifFolderPath);
+    File[] files = pictureSessionDir.listFiles();
     if ((files.length > 0) && (mGifVisualization != null)) {
       Glide.with(this)
           .load(files[0].getAbsolutePath())
@@ -189,8 +187,7 @@ public class ShareGifActivity extends AppCompatActivity {
   }
 
   private void createGif(final String pictureSessionFolder) {
-    File pictureSessionDir = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES),
-        pictureSessionFolder);
+    File pictureSessionDir = PicturesDirectory.get(pictureSessionFolder);
     new CreateGifAsVideo().createGif(pictureSessionDir, getBackgroundHandler(), new CreateGif.Listener() {
       @Override
       public void onGifCreated(final File gifFile) {

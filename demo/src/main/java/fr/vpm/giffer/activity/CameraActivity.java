@@ -25,7 +25,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.annotation.NonNull;
@@ -55,6 +54,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import fr.vpm.giffer.PicturesDirectory;
 import fr.vpm.giffer.PostToTumblrBlog;
 import fr.vpm.giffer.R;
 import fr.vpm.giffer.giffer.CameraView;
@@ -98,6 +98,10 @@ public class CameraActivity extends AppCompatActivity implements
           if (mCameraView != null) {
             mTakingPictureFab.hide();
             mPictureSessionFolder = new SimpleDateFormat("yyyyMMdd-HHmmss", Locale.FRANCE).format(new Date());
+            File pictureSessionDir = PicturesDirectory.get(mPictureSessionFolder);
+            boolean mkdir = pictureSessionDir.mkdir();
+            Log.d(TAG, "Creating session folder : " + mkdir);
+
             new CountDownTimer(4000, 1000) {
 
               @Override
@@ -136,9 +140,8 @@ public class CameraActivity extends AppCompatActivity implements
       getBackgroundHandler().post(new Runnable() {
         @Override
         public void run() {
-          File externalFilesDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-          File pictureSessionDir = new File(externalFilesDir, mPictureSessionFolder);
-          pictureSessionDir.mkdir();
+          File pictureSessionDir = PicturesDirectory.get(mPictureSessionFolder);
+          Log.d(TAG, pictureSessionDir.getAbsolutePath());
           File file = new File(pictureSessionDir,
               "picture-" + System.currentTimeMillis() + ".jpg");
           Log.d(TAG, "Saving to " + file.getAbsolutePath());
@@ -166,7 +169,7 @@ public class CameraActivity extends AppCompatActivity implements
     public void onProgress(long percentage) {
       Log.d(TAG, "made progress at " + percentage);
       mProgress.setProgress((int) (100 - percentage));
-      if (percentage > 95) {
+      if (percentage > 90) {
         mProgress.setVisibility(View.VISIBLE);
       }
     }
