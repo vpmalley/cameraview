@@ -191,6 +191,7 @@ public class CameraActivity extends AppCompatActivity implements
     setContentView(R.layout.activity_camera);
     postToTumblr = new PostToTumblrBlog(this);
     mCameraView = (CameraView) findViewById(R.id.camera);
+    mCameraView.setFacing(CameraView.FACING_FRONT);
     if (mCameraView != null) {
       mCameraView.addCallback(mCallback);
     }
