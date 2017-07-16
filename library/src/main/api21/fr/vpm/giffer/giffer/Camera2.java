@@ -663,6 +663,7 @@ class Camera2 extends CameraViewImpl {
                 @Override
                 public void onFinish() {
                     try {
+                        Log.d(TAG, "Stop capturing");
                         mCaptureSession.stopRepeating();
                     } catch (CameraAccessException e) {
                         Log.e(TAG, "Cannot stop capturing pictures.", e);

@@ -176,6 +176,7 @@ public class CameraActivity extends AppCompatActivity implements
 
     @Override
     public void onAllPicturesTaken() {
+      Log.d(TAG, "onAllPicturesTaken");
       mProgress.setVisibility(View.GONE);
 
       Intent i = new Intent(CameraActivity.this, ShareGifActivity.class);
