@@ -15,6 +15,7 @@ import com.facebook.share.model.ShareMediaContent;
 import com.facebook.share.model.SharePhoto;
 import com.facebook.share.model.SharePhotoContent;
 import com.facebook.share.model.ShareVideo;
+import com.facebook.share.model.ShareVideoContent;
 
 import java.io.File;
 
@@ -26,18 +27,16 @@ public class PostToFacebookAlbum {
     Log.w(POST_TO_ALBUM, "sharing gif to fb");
 
     Uri uri = Uri.fromFile(new File(gifFileAbsolutePath));
-
-    SharePhoto sharePhoto = new SharePhoto.Builder()
-        .setImageUrl(uri)
-        .setCaption("some gif")
-        .setUserGenerated(true)
+    ShareVideo shareVideo = new ShareVideo.Builder()
+        .setLocalUrl(uri)
         .build();
 
-    SharePhotoContent sharePhotoContent = new SharePhotoContent.Builder()
-        .addPhoto(sharePhoto)
+    ShareVideoContent shareVideoContent= new ShareVideoContent.Builder()
+        .setVideo(shareVideo)
+        .setContentTitle("giffing")
         .build();
 
-    ShareApi shareApi = new ShareApi(sharePhotoContent);
+    ShareApi shareApi = new ShareApi(shareVideoContent);
     shareApi.setGraphNode("10211351342553032");
     shareApi.setMessage("Another Gif");
     shareApi.share(new FacebookCallback<Sharer.Result>() {

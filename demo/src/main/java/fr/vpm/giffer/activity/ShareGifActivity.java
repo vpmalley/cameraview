@@ -42,7 +42,7 @@ import com.facebook.login.widget.LoginButton;
 import java.io.File;
 
 import fr.vpm.giffer.CreateGif;
-import fr.vpm.giffer.CreateGif1;
+import fr.vpm.giffer.CreateGifAsVideo;
 import fr.vpm.giffer.PicturesDirectory;
 import fr.vpm.giffer.PostToFacebookAlbum;
 import fr.vpm.giffer.PostToTumblrBlog;
@@ -188,7 +188,7 @@ public class ShareGifActivity extends AppCompatActivity {
 
   private void createGif(final String pictureSessionFolder) {
     File pictureSessionDir = PicturesDirectory.get(pictureSessionFolder);
-    new CreateGif1().createGif(pictureSessionDir, getBackgroundHandler(), new CreateGif.Listener() {
+    new CreateGifAsVideo().createGif(pictureSessionDir, getBackgroundHandler(), new CreateGif.Listener() {
       @Override
       public void onGifCreated(final File gifFile) {
         mProgress.post(new Runnable() {
