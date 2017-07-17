@@ -28,7 +28,7 @@ public class GetFacebookAlbums {
     Log.d(GET_FACEBOOK_ALBUMS, "querying albums");
     new GraphRequest(
         AccessToken.getCurrentAccessToken(),
-        "/" + AccessToken.getCurrentAccessToken().getUserId() + "/albums",
+        "/" + AccessToken.getCurrentAccessToken().getUserId() + "/albums", // "/accounts" for pages
         null,
         HttpMethod.GET,
         new GraphRequest.Callback() {

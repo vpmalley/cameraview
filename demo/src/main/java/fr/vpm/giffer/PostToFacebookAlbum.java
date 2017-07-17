@@ -37,7 +37,8 @@ public class PostToFacebookAlbum {
         .build();
 
     ShareApi shareApi = new ShareApi(shareVideoContent);
-    shareApi.setGraphNode("10211351342553032");
+    //shareApi.setGraphNode("10211351342553032"); // album
+    shareApi.setGraphNode("1475683019176601"); // page
     shareApi.setMessage("Another Gif");
     shareApi.share(new FacebookCallback<Sharer.Result>() {
       @Override

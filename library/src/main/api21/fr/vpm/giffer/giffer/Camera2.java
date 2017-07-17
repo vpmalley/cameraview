@@ -48,7 +48,7 @@ class Camera2 extends CameraViewImpl {
     private static final String TAG = "Camera2";
 
     private static final SparseIntArray INTERNAL_FACINGS = new SparseIntArray();
-    private static final int EXPOSITION_DURATION = 6000;
+    private static final int EXPOSITION_DURATION = 12000;
     private static final int MAX_SIZE = 1800;
 
     static {
