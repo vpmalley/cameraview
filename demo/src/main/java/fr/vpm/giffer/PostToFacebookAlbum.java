@@ -1,6 +1,8 @@
 package fr.vpm.giffer;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.util.Log;
 
@@ -10,6 +12,8 @@ import com.facebook.share.ShareApi;
 import com.facebook.share.Sharer;
 import com.facebook.share.model.ShareContent;
 import com.facebook.share.model.ShareMediaContent;
+import com.facebook.share.model.SharePhoto;
+import com.facebook.share.model.SharePhotoContent;
 import com.facebook.share.model.ShareVideo;
 
 import java.io.File;
@@ -22,14 +26,18 @@ public class PostToFacebookAlbum {
     Log.w(POST_TO_ALBUM, "sharing gif to fb");
 
     Uri uri = Uri.fromFile(new File(gifFileAbsolutePath));
-    ShareVideo shareVideo = new ShareVideo.Builder()
-        .setLocalUrl(uri)
+
+    SharePhoto sharePhoto = new SharePhoto.Builder()
+        .setImageUrl(uri)
+        .setCaption("some gif")
+        .setUserGenerated(true)
         .build();
 
-    ShareContent shareContent = new ShareMediaContent.Builder()
-        .addMedium(shareVideo)
+    SharePhotoContent sharePhotoContent = new SharePhotoContent.Builder()
+        .addPhoto(sharePhoto)
         .build();
-    ShareApi shareApi = new ShareApi(shareContent);
+
+    ShareApi shareApi = new ShareApi(sharePhotoContent);
     shareApi.setGraphNode("10211351342553032");
     shareApi.setMessage("Another Gif");
     shareApi.share(new FacebookCallback<Sharer.Result>() {
@@ -41,12 +49,12 @@ public class PostToFacebookAlbum {
 
       @Override
       public void onCancel() {
-        Log.d(POST_TO_ALBUM, "posting cancelled");
+        Log.w(POST_TO_ALBUM, "posting cancelled");
       }
 
       @Override
       public void onError(FacebookException error) {
-        Log.d(POST_TO_ALBUM, error.getMessage());
+        Log.w(POST_TO_ALBUM, error.getMessage());
       }
     });
   }
