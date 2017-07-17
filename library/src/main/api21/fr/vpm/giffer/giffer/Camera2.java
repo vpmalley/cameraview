@@ -159,6 +159,7 @@ class Camera2 extends CameraViewImpl {
 
         @Override
         public void onImageAvailable(ImageReader reader) {
+            Log.d("TookPic", "read next image");
             try (Image image = reader.acquireNextImage()) {
                 Image.Plane[] planes = image.getPlanes();
                 if (planes.length > 0) {
@@ -605,34 +606,8 @@ class Camera2 extends CameraViewImpl {
             CaptureRequest.Builder captureRequestBuilder = mCamera.createCaptureRequest(
                     CameraDevice.TEMPLATE_STILL_CAPTURE);
             captureRequestBuilder.addTarget(mImageReader.getSurface());
-            captureRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE,
-                    mPreviewRequestBuilder.get(CaptureRequest.CONTROL_AF_MODE));
-            switch (mFlash) {
-                case Constants.FLASH_OFF:
-                    captureRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE,
-                            CaptureRequest.CONTROL_AE_MODE_ON);
-                    captureRequestBuilder.set(CaptureRequest.FLASH_MODE,
-                            CaptureRequest.FLASH_MODE_OFF);
-                    break;
-                case Constants.FLASH_ON:
-                    captureRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE,
-                            CaptureRequest.CONTROL_AE_MODE_ON_ALWAYS_FLASH);
-                    break;
-                case Constants.FLASH_TORCH:
-                    captureRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE,
-                            CaptureRequest.CONTROL_AE_MODE_ON);
-                    captureRequestBuilder.set(CaptureRequest.FLASH_MODE,
-                            CaptureRequest.FLASH_MODE_TORCH);
-                    break;
-                case Constants.FLASH_AUTO:
-                    captureRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE,
-                            CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH);
-                    break;
-                case Constants.FLASH_RED_EYE:
-                    captureRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE,
-                            CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH);
-                    break;
-            }
+            captureRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
+            captureRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_OFF);
             // Calculate JPEG orientation.
             @SuppressWarnings("ConstantConditions")
             int sensorOrientation = mCameraCharacteristics.get(
@@ -682,6 +657,7 @@ class Camera2 extends CameraViewImpl {
      * capturing a still picture.
      */
     void unlockFocus() {
+        Log.d("TookPic", "unlockFocus");
         mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AF_TRIGGER,
                 CaptureRequest.CONTROL_AF_TRIGGER_CANCEL);
         try {

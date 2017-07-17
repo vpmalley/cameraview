@@ -29,6 +29,7 @@ import android.support.v4.os.ParcelableCompat;
 import android.support.v4.os.ParcelableCompatCreatorCallbacks;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.widget.FrameLayout;
 
 import java.lang.annotation.Retention;
@@ -445,6 +446,7 @@ public class CameraView extends FrameLayout {
 
         @Override
         public void onPictureTaken(byte[] data) {
+            Log.d("TookPic", "onPicTaken");
             for (Callback callback : mCallbacks) {
                 callback.onPictureTaken(CameraView.this, data);
             }
