@@ -89,11 +89,11 @@ public class CameraActivity extends AppCompatActivity implements
     public void onClick(View v) {
       switch (v.getId()) {
         case R.id.take_picture:
-          if (!postToTumblr.hasAccessToken()) {
-            Log.d("CameraA", "authenticating");
-            postToTumblr.authenticate(getBackgroundHandler());
-            return;
-          }
+//          if (!postToTumblr.hasAccessToken()) {
+//            Log.d("CameraA", "authenticating");
+//            postToTumblr.authenticate(getBackgroundHandler());
+//            return;
+//          }
           Log.d("CameraA", "taking pics");
           if (mCameraView != null) {
             mTakingPictureFab.hide();
