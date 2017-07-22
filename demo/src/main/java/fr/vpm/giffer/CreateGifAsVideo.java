@@ -19,32 +19,38 @@ public class CreateGifAsVideo implements CreateGif {
   public static final String TAG = "CreateGifAsVideo";
 
   @Override
-  public void createGif(File pictureSessionDir, Handler backgroundHandler, Listener listener) {
+  public void createGif(final File pictureSessionDir, Handler backgroundHandler, final Listener listener) {
     if (!pictureSessionDir.isDirectory()) {
       return;
     }
-    File videoFile = new File(pictureSessionDir,
-        "video-" + System.currentTimeMillis() + ".mp4");
-    SequenceEncoder enc = null;
-    try {
-      enc = new SequenceEncoder(videoFile);
-      //enc.getEncoder().setKeyInterval(25);
+    backgroundHandler.post(new Runnable() {
+      @Override
+      public void run() {
+        File videoFile = new File(pictureSessionDir,
+            "video-" + System.currentTimeMillis() + ".mp4");
+        SequenceEncoder enc = null;
+        try {
+          enc = new SequenceEncoder(videoFile);
+          //enc.getEncoder().setKeyInterval(25);
 
-      for(File nextPic : pictureSessionDir.listFiles()) {
-        if (nextPic.getName().startsWith("picture-")) {
-          Log.d(TAG, "getting bitmap for pic " + nextPic.getName());
-          for (int i = 0; i < 2; i++) {
-            Bitmap frameBitmap = bitmapOf(nextPic);
-            Log.d(TAG, "adding frame for pic " + nextPic.getName());
-            enc.encodeImage(frameBitmap);
+          for(File nextPic : pictureSessionDir.listFiles()) {
+            if (nextPic.getName().startsWith("picture-")) {
+              Log.d(TAG, "getting bitmap for pic " + nextPic.getName());
+              for (int i = 0; i < 2; i++) {
+                Bitmap frameBitmap = bitmapOf(nextPic);
+                Log.d(TAG, "adding frame for pic " + nextPic.getName());
+                enc.encodeImage(frameBitmap);
+              }
+            }
           }
+          enc.finish();
+        } catch (IOException e) {
+          Log.w(TAG, e);
         }
+        listener.onGifCreated(videoFile);
+
       }
-      enc.finish();
-    } catch (IOException e) {
-      Log.w(TAG, e);
-    }
-    listener.onGifCreated(videoFile);
+    });
   }
 
   private Bitmap bitmapOf(File nextPicPath) {
