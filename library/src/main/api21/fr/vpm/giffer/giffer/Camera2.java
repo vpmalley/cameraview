@@ -50,6 +50,7 @@ class Camera2 extends CameraViewImpl {
     private static final SparseIntArray INTERNAL_FACINGS = new SparseIntArray();
     private static final int EXPOSITION_DURATION = 12000;
     private static final int MAX_SIZE = 1800;
+    public static final int NB_SHOTS = 20;
 
     static {
         INTERNAL_FACINGS.put(Constants.FACING_BACK, CameraCharacteristics.LENS_FACING_BACK);
@@ -149,7 +150,6 @@ class Camera2 extends CameraViewImpl {
 
         @Override
         public void onReady() {
-            captureBunchOfPictures();
         }
 
     };
@@ -199,6 +199,7 @@ class Camera2 extends CameraViewImpl {
     private int mFlash;
 
     private int mDisplayOrientation;
+    private int mCounter;
 
     Camera2(Callback callback, PreviewImpl preview, Context context) {
         super(callback, preview);
@@ -341,7 +342,8 @@ class Camera2 extends CameraViewImpl {
         if (mAutoFocus) {
             lockFocus();
         } else {
-            captureBunchOfPictures();
+            mCounter = NB_SHOTS;
+            captureStillPicture();
         }
     }
 
@@ -595,6 +597,80 @@ class Camera2 extends CameraViewImpl {
             mCaptureSession.capture(mPreviewRequestBuilder.build(), mCaptureCallback, null);
         } catch (CameraAccessException e) {
             Log.e(TAG, "Failed to lock focus.", e);
+        }
+    }
+
+    /**
+     * Captures a still picture.
+     */
+    void captureStillPicture() {
+        try {
+            CaptureRequest.Builder captureRequestBuilder = mCamera.createCaptureRequest(
+                CameraDevice.TEMPLATE_STILL_CAPTURE);
+            captureRequestBuilder.addTarget(mImageReader.getSurface());
+            captureRequestBuilder.addTarget(mPreview.getSurface());
+            captureRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE,
+                mPreviewRequestBuilder.get(CaptureRequest.CONTROL_AF_MODE));
+            switch (mFlash) {
+                case Constants.FLASH_OFF:
+                    captureRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE,
+                        CaptureRequest.CONTROL_AE_MODE_ON);
+                    captureRequestBuilder.set(CaptureRequest.FLASH_MODE,
+                        CaptureRequest.FLASH_MODE_OFF);
+                    break;
+                case Constants.FLASH_ON:
+                    captureRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE,
+                        CaptureRequest.CONTROL_AE_MODE_ON_ALWAYS_FLASH);
+                    break;
+                case Constants.FLASH_TORCH:
+                    captureRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE,
+                        CaptureRequest.CONTROL_AE_MODE_ON);
+                    captureRequestBuilder.set(CaptureRequest.FLASH_MODE,
+                        CaptureRequest.FLASH_MODE_TORCH);
+                    break;
+                case Constants.FLASH_AUTO:
+                    captureRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE,
+                        CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH);
+                    break;
+                case Constants.FLASH_RED_EYE:
+                    captureRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE,
+                        CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH);
+                    break;
+            }
+            // Calculate JPEG orientation.
+            @SuppressWarnings("ConstantConditions")
+            int sensorOrientation = mCameraCharacteristics.get(
+                CameraCharacteristics.SENSOR_ORIENTATION);
+            captureRequestBuilder.set(CaptureRequest.JPEG_ORIENTATION,
+                (sensorOrientation +
+                    mDisplayOrientation * (mFacing == Constants.FACING_FRONT ? 1 : -1) +
+                    360) % 360);
+            // Stop preview and capture a still picture.
+            mCaptureSession.stopRepeating();
+            mCaptureSession.capture(captureRequestBuilder.build(),
+                new CameraCaptureSession.CaptureCallback() {
+                    @Override
+                    public void onCaptureCompleted(@NonNull CameraCaptureSession session,
+                                                   @NonNull CaptureRequest request,
+                                                   @NonNull TotalCaptureResult result) {
+
+                        // TODO take a couple more
+                        if (mCounter-- == 0) {
+                            unlockFocus();
+                            mCallback.onAllPicturesTaken();
+                        } else {
+                            try {
+                                mCallback.onProgress(mCounter * 100 / NB_SHOTS);
+                                Thread.sleep(50);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            captureStillPicture();
+                        }
+                    }
+                }, null);
+        } catch (CameraAccessException e) {
+            Log.e(TAG, "Cannot capture a still picture.", e);
         }
     }
 
