@@ -136,12 +136,11 @@ public class CameraActivity extends AppCompatActivity implements
 
     @Override
     public void onPictureTaken(CameraView cameraView, final byte[] data) {
-      Log.d("TookPic", "onPictureTaken " + data.length);
+      Log.d(TAG, "onPictureTaken " + data.length);
       getBackgroundHandler().post(new Runnable() {
         @Override
         public void run() {
           File pictureSessionDir = PicturesDirectory.get(mPictureSessionFolder);
-          Log.d(TAG, pictureSessionDir.getAbsolutePath());
           File file = new File(pictureSessionDir,
               "picture-" + System.currentTimeMillis() + ".jpg");
           Log.d(TAG, "Saving to " + file.getAbsolutePath());
@@ -160,6 +159,7 @@ public class CameraActivity extends AppCompatActivity implements
                 // Ignore
               }
             }
+            Log.d(TAG, "Saved to " + file.getAbsolutePath());
           }
         }
       });
