@@ -99,8 +99,11 @@ public class CameraActivity extends AppCompatActivity implements
             mTakingPictureFab.hide();
             mPictureSessionFolder = new SimpleDateFormat("yyyyMMdd-HHmmss", Locale.FRANCE).format(new Date());
             File pictureSessionDir = PicturesDirectory.get(mPictureSessionFolder);
-            boolean mkdir = pictureSessionDir.mkdir();
-            Log.d(TAG, "Creating session folder : " + mkdir);
+            boolean createdDirectory = pictureSessionDir.mkdir();
+            if (!createdDirectory) {
+              Toast.makeText(CameraActivity.this, "Please let this app write to external storage", Toast.LENGTH_SHORT).show();
+            }
+            Log.d(TAG, "Creating session folder : " + createdDirectory);
 
             new CountDownTimer(4000, 1000) {
 

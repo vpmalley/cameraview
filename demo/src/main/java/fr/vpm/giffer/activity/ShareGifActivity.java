@@ -141,7 +141,7 @@ public class ShareGifActivity extends AppCompatActivity {
     }
     File pictureSessionDir = PicturesDirectory.get(gifFolderPath);
     File[] files = pictureSessionDir.listFiles();
-    if ((files.length > 0) && (mGifVisualization != null)) {
+    if ((files != null) && (files.length > 0) && (mGifVisualization != null)) {
       Glide.with(this)
           .load(files[0].getAbsolutePath())
           .into(mGifVisualization);
