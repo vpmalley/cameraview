@@ -50,7 +50,7 @@ class Camera2 extends CameraViewImpl {
     private static final SparseIntArray INTERNAL_FACINGS = new SparseIntArray();
     private static final int EXPOSITION_DURATION = 12000;
     private static final int MAX_SIZE = 1800;
-    public static final int NB_SHOTS = 20;
+    public static final int NB_SHOTS = 24;
 
     static {
         INTERNAL_FACINGS.put(Constants.FACING_BACK, CameraCharacteristics.LENS_FACING_BACK);
