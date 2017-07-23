@@ -43,7 +43,7 @@ public class PostToFacebookAlbum {
     shareApi.share(new FacebookCallback<Sharer.Result>() {
       @Override
       public void onSuccess(Sharer.Result result) {
-        Log.d(POST_TO_ALBUM, "posting succeeded: " + result.toString());
+        Log.d(POST_TO_ALBUM, "posting succeeded: " + result.getPostId());
         listener.onPicturePublished();
       }
 
