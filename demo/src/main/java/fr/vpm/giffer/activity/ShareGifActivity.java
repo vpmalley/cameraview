@@ -17,6 +17,8 @@
 package fr.vpm.giffer.activity;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -113,7 +115,6 @@ public class ShareGifActivity extends AppCompatActivity {
             onBackPressed();
           }
         });
-        //postToTumblr.post(new File(ShareGifActivity.this.gifFileAbsolutePath));
       }
     });
     mBackToCamera.setOnClickListener(new View.OnClickListener() {
@@ -164,17 +165,54 @@ public class ShareGifActivity extends AppCompatActivity {
     if (mTalkingToUser != null) {
       mTalkingToUser.setText("Processing your pics");
     }
-    File pictureSessionDir = PicturesDirectory.get(gifFolderPath);;
+    loadFirstPicture();
+    createGif(gifFolderPath);
+    if (mShareToFbFab != null) {
+      mShareToFbFab.hide();
+    }
+  }
+
+  private void loadFirstPicture() {
+    File pictureSessionDir = PicturesDirectory.get(gifFolderPath);
     File[] files = pictureSessionDir.listFiles();
     if ((files != null) && (files.length > 0) && (mGifVisualization != null)) {
       Glide.with(this)
           .load(files[0].getAbsolutePath())
           .into(mGifVisualization);
     }
-    createGif(gifFolderPath);
-    if (mShareToFbFab != null) {
-      mShareToFbFab.hide();
+  }
+
+  private void loadSlideshow() {
+    File pictureSessionDir = PicturesDirectory.get(gifFolderPath);
+    File[] files = pictureSessionDir.listFiles();
+    if ((files != null) && (files.length > 0) && (mGifVisualization != null)) {
+      loadSlideshowPicture(0, files);
     }
+  }
+
+  private void loadSlideshowPicture(final int fileIndex, final File[] files) {
+    getBackgroundHandler().post(new Runnable() {
+      @Override
+      public void run() {
+        if (fileIndex == files.length) {
+          Log.d(TAG, "loading slideshow again");
+          loadSlideshow();
+          return;
+        }
+        if (files[fileIndex].getAbsolutePath().contains("picture-")) {
+          final Bitmap b = bitmapOf(files[fileIndex].getAbsolutePath());
+          mGifVisualization.postDelayed(new Runnable() {
+            public void run() {
+              mGifVisualization.setImageBitmap(b);
+              Log.d(TAG, "loading pic " + fileIndex);
+              loadSlideshowPicture(fileIndex + 1, files);
+            }
+          }, 100);
+        } else {
+          loadSlideshowPicture(fileIndex + 1, files);
+        }
+      }
+    });
   }
 
   @Override
@@ -232,9 +270,14 @@ public class ShareGifActivity extends AppCompatActivity {
     mTalkingToUser.setText("Gif processed");
     Log.d(TAG, "Gif processed : " + gifAbsolutePath);
     mShareToFbFab.show();
-//    Uri uri = Uri.parse(gifAbsolutePath);
-//    Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-//    intent.setDataAndType(uri, "video/mp4");
-//    startActivity(intent);
+    loadSlideshow();
   }
+
+  private Bitmap bitmapOf(String nextPicPath) {
+    BitmapFactory.Options options = new BitmapFactory.Options();
+    options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+    Bitmap bitmap = BitmapFactory.decodeFile(nextPicPath, options);
+    return bitmap;
+  }
+
 }
