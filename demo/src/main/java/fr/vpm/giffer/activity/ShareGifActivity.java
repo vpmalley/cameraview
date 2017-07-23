@@ -31,6 +31,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.VideoView;
 
 import com.bumptech.glide.Glide;
 import com.facebook.CallbackManager;
@@ -60,6 +61,8 @@ public class ShareGifActivity extends AppCompatActivity {
 
   private ImageView mGifVisualization;
 
+  private VideoView mGifShow;
+
   private TextView mTalkingToUser;
 
   private FloatingActionButton mShareToFbFab;
@@ -79,6 +82,7 @@ public class ShareGifActivity extends AppCompatActivity {
     setContentView(R.layout.activity_share_gif);
     postToTumblr = new PostToTumblrBlog(this);
     mGifVisualization = (ImageView) findViewById(R.id.gif);
+    mGifShow = (VideoView) findViewById(R.id.gif_video);
     mTalkingToUser = (TextView) findViewById(R.id.talkingToUser);
     mShareToFbFab = (FloatingActionButton) findViewById(R.id.share_picture);
     mShareToFbFab.setOnClickListener(new View.OnClickListener() {
@@ -205,10 +209,11 @@ public class ShareGifActivity extends AppCompatActivity {
     this.gifFileAbsolutePath = gifAbsolutePath;
     mProgress.setVisibility(View.GONE);
     mTalkingToUser.setText("Gif processed");
-    Log.d(TAG, "Gif processed");
+    Log.d(TAG, "Gif processed : " + gifAbsolutePath);
     mShareToFbFab.show();
-//    Glide.with(this)
-//        .load(gifAbsolutePath)
-//        .into(mGifVisualization);
+//    Uri uri = Uri.parse(gifAbsolutePath);
+//    Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+//    intent.setDataAndType(uri, "video/mp4");
+//    startActivity(intent);
   }
 }
