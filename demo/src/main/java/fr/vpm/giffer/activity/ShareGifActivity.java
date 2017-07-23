@@ -87,6 +87,20 @@ public class ShareGifActivity extends AppCompatActivity {
     mGifShow = (VideoView) findViewById(R.id.gif_video);
     mTalkingToUser = (TextView) findViewById(R.id.talkingToUser);
     mShareToFbFab = (FloatingActionButton) findViewById(R.id.share_picture);
+    mBackToCamera = (FloatingActionButton) findViewById(R.id.back_to_camera);
+    mProgress = (ProgressBar) findViewById(R.id.gif_progress);
+    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+    setSupportActionBar(toolbar);
+    ActionBar actionBar = getSupportActionBar();
+    if (actionBar != null) {
+      actionBar.setDisplayShowTitleEnabled(false);
+    }
+    setFabClickListeners();
+    extractPathFromIntent();
+    prepareFacebookLogin();
+  }
+
+  private void setFabClickListeners() {
     mShareToFbFab.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
@@ -102,27 +116,16 @@ public class ShareGifActivity extends AppCompatActivity {
         //postToTumblr.post(new File(ShareGifActivity.this.gifFileAbsolutePath));
       }
     });
-    mBackToCamera = (FloatingActionButton) findViewById(R.id.back_to_camera);
     mBackToCamera.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
         onBackPressed();
       }
     });
-    mProgress = (ProgressBar) findViewById(R.id.gif_progress);
-    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-    setSupportActionBar(toolbar);
-    ActionBar actionBar = getSupportActionBar();
-    if (actionBar != null) {
-      actionBar.setDisplayShowTitleEnabled(false);
-    }
-    Intent i = getIntent();
-    if (i != null) {
-      gifFolderPath = i.getStringExtra("GIF_PATH");
-    }
+  }
 
+  private void prepareFacebookLogin() {
     callbackManager = CallbackManager.Factory.create();
-
     LoginButton loginButton = (LoginButton) findViewById(R.id.login_button);
     loginButton.setPublishPermissions("publish_actions");
     loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
@@ -141,7 +144,13 @@ public class ShareGifActivity extends AppCompatActivity {
         // App code
       }
     });
+  }
 
+  private void extractPathFromIntent() {
+    Intent i = getIntent();
+    if (i != null) {
+      gifFolderPath = i.getStringExtra("GIF_PATH");
+    }
   }
 
   @Override
@@ -155,7 +164,7 @@ public class ShareGifActivity extends AppCompatActivity {
     if (mTalkingToUser != null) {
       mTalkingToUser.setText("Processing your pics");
     }
-    File pictureSessionDir = PicturesDirectory.get(gifFolderPath);
+    File pictureSessionDir = PicturesDirectory.get(gifFolderPath);;
     File[] files = pictureSessionDir.listFiles();
     if ((files != null) && (files.length > 0) && (mGifVisualization != null)) {
       Glide.with(this)
