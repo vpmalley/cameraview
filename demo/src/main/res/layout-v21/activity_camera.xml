@@ -29,19 +29,6 @@
         android:adjustViewBounds="true"
         android:background="@android:color/black" />
 
-    <TextView
-        android:id="@+id/talkingToUser"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@id/camera"
-        android:adjustViewBounds="true"
-        android:textAlignment="center"
-        android:textColor="@android:color/white"
-        android:textSize="40sp" />
-
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
@@ -50,6 +37,20 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true" />
 
+    <TextView
+        android:id="@+id/picture_countdown"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:gravity="center"
+        android:adjustViewBounds="true"
+        android:textAlignment="center"
+        android:textSize="30sp"
+        android:layout_marginBottom="32dp"
+        android:textColor="@android:color/white"
+        android:elevation="10dp"/>
+
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/take_picture"
         android:layout_width="wrap_content"
@@ -57,16 +58,20 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         app:srcCompat="@drawable/ic_camera"
-        app:useCompatPadding="true" />
+        android:scaleType="center"
+        app:useCompatPadding="true"
+        android:layout_marginBottom="35dp"
+        android:elevation="0dp"/>
 
     <ProgressBar
         android:id="@+id/picture_progress"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:paddingBottom="10dp"
-        android:visibility="gone"
-        android:color="@color/accent"
-        style="@android:style/Widget.Material.ProgressBar.Horizontal" />
+        android:layout_marginBottom="30dp"
+        android:max="100"
+        android:progress="0"
+        android:progressDrawable="@drawable/circular_progress" />
 </RelativeLayout>

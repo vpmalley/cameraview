@@ -17,6 +17,7 @@
 package fr.vpm.giffer.activity;
 
 import android.Manifest;
+import android.animation.ObjectAnimator;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -41,6 +42,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -96,7 +98,7 @@ public class CameraActivity extends AppCompatActivity implements
 //          }
           Log.d("CameraA", "taking pics");
           if (mCameraView != null) {
-            mTakingPictureFab.hide();
+            mTakingPictureFab.setImageAlpha(0);
             mPictureSessionFolder = new SimpleDateFormat("yyyyMMdd-HHmmss", Locale.FRANCE).format(new Date());
             File pictureSessionDir = PicturesDirectory.get(mPictureSessionFolder);
             boolean createdDirectory = pictureSessionDir.mkdir();
@@ -105,17 +107,17 @@ public class CameraActivity extends AppCompatActivity implements
             }
             Log.d(TAG, "Creating session folder : " + createdDirectory);
 
-            new CountDownTimer(4000, 1000) {
+            new CountDownTimer(4000, 200) {
 
               @Override
               public void onTick(long l) {
                 long leftSeconds = l / 1000;
-                mTalkingToUser.setText(String.valueOf(leftSeconds));
+                mTalkingToUser.setText(String.valueOf(leftSeconds + 1));
               }
 
               @Override
               public void onFinish() {
-                mTalkingToUser.setText("Cheeeese!");
+                mTalkingToUser.setText("");
                 mCameraView.takePicture();
               }
             }.start();
@@ -172,8 +174,12 @@ public class CameraActivity extends AppCompatActivity implements
     public void onProgress(long percentage) {
       Log.d(TAG, "made progress at " + percentage);
       mProgress.setProgress((int) (100 - percentage));
-      if (percentage > 90) {
+      if (percentage > 91) {
         mProgress.setVisibility(View.VISIBLE);
+//        ObjectAnimator animation = ObjectAnimator.ofInt (mProgress, "progress", 0, 500); // see this max value coming back here, we animale towards that value
+//        animation.setDuration (5000); //in milliseconds
+//        animation.setInterpolator (new DecelerateInterpolator());
+//        animation.start();
       }
     }
 
@@ -198,7 +204,7 @@ public class CameraActivity extends AppCompatActivity implements
     if (mCameraView != null) {
       mCameraView.addCallback(mCallback);
     }
-    mTalkingToUser = (TextView) findViewById(R.id.talkingToUser);
+    mTalkingToUser = (TextView) findViewById(R.id.picture_countdown);
     mTakingPictureFab = (FloatingActionButton) findViewById(R.id.take_picture);
     if (mTakingPictureFab != null) {
       mTakingPictureFab.setOnClickListener(mOnClickListener);
