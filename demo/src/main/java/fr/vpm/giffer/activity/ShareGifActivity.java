@@ -163,7 +163,7 @@ public class ShareGifActivity extends AppCompatActivity {
   protected void onResume() {
     super.onResume();
     if (mTalkingToUser != null) {
-      mTalkingToUser.setText("Processing your pics");
+      mTalkingToUser.setText(R.string.creating_gif);
     }
     loadFirstPicture();
     createGif(gifFolderPath);
@@ -267,7 +267,7 @@ public class ShareGifActivity extends AppCompatActivity {
   private void onGifProcessed(String gifAbsolutePath) {
     this.gifFileAbsolutePath = gifAbsolutePath;
     mProgress.setVisibility(View.GONE);
-    mTalkingToUser.setText("Gif processed");
+    mTalkingToUser.setText(R.string.gif_ready);
     Log.d(TAG, "Gif processed : " + gifAbsolutePath);
     mShareToFbFab.show();
     loadSlideshow();

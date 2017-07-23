@@ -22,4 +22,6 @@
     <string name="flash_off">Flash off</string>
     <string name="flash_on">Flash on</string>
     <string name="oauth_preference_file_key">vpmgifferoauth</string>
+    <string name="gif_ready">Video ready. Share it, now!</string>
+    <string name="creating_gif">Hang on, we\'re creating your video</string>
 </resources>
