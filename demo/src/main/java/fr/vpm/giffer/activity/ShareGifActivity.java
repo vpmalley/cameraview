@@ -47,7 +47,6 @@ import fr.vpm.giffer.CreateGif;
 import fr.vpm.giffer.CreateGifAsVideo;
 import fr.vpm.giffer.PicturesDirectory;
 import fr.vpm.giffer.PostToFacebookAlbum;
-import fr.vpm.giffer.PostToTumblrBlog;
 import fr.vpm.giffer.R;
 
 public class ShareGifActivity extends AppCompatActivity {
@@ -74,14 +73,12 @@ public class ShareGifActivity extends AppCompatActivity {
   private CallbackManager callbackManager;
   private String gifFileAbsolutePath;
   private PostToFacebookAlbum postToFacebookAlbum = new PostToFacebookAlbum();
-  private PostToTumblrBlog postToTumblr;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     Log.d("SHARE-GIF", "onCreate");
     setContentView(R.layout.activity_share_gif);
-    postToTumblr = new PostToTumblrBlog(this);
     mGifVisualization = (ImageView) findViewById(R.id.gif);
     mTalkingToUser = (TextView) findViewById(R.id.talkingToUser);
     mShareToFbFab = (FloatingActionButton) findViewById(R.id.share_picture);
