@@ -187,6 +187,7 @@ public class CameraActivity extends AppCompatActivity implements
     public void onAllPicturesTaken() {
       Log.d(TAG, "onAllPicturesTaken");
       mProgress.setVisibility(View.GONE);
+      mTakingPictureFab.setImageAlpha(500);
 
       Intent i = new Intent(CameraActivity.this, ShareGifActivity.class);
       i.putExtra("GIF_PATH", mPictureSessionFolder);

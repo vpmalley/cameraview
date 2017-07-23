@@ -67,6 +67,8 @@ public class ShareGifActivity extends AppCompatActivity {
 
   private FloatingActionButton mShareToFbFab;
 
+  private FloatingActionButton mBackToCamera;
+
   private ProgressBar mProgress;
 
   private String gifFolderPath;
@@ -88,13 +90,23 @@ public class ShareGifActivity extends AppCompatActivity {
     mShareToFbFab.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
+        mProgress.setVisibility(View.VISIBLE);
         postToFacebookAlbum.shareGifToFb(ShareGifActivity.this.gifFileAbsolutePath, ShareGifActivity.this, new PostToFacebookAlbum.Listener() {
           @Override
           public void onPicturePublished() {
-            Toast.makeText(ShareGifActivity.this, "Gif uploaded to album", Toast.LENGTH_SHORT).show();
+            Toast.makeText(ShareGifActivity.this, "Your video is shared on Facebook :) Check the page", Toast.LENGTH_LONG).show();
+            mProgress.setVisibility(View.GONE);
+            onBackPressed();
           }
         });
         //postToTumblr.post(new File(ShareGifActivity.this.gifFileAbsolutePath));
+      }
+    });
+    mBackToCamera = (FloatingActionButton) findViewById(R.id.back_to_camera);
+    mBackToCamera.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        onBackPressed();
       }
     });
     mProgress = (ProgressBar) findViewById(R.id.gif_progress);
