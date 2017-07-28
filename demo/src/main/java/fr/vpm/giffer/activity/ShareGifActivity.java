@@ -40,6 +40,7 @@ import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
+import com.facebook.share.Sharer;
 
 import java.io.File;
 
@@ -52,6 +53,8 @@ import fr.vpm.giffer.R;
 public class ShareGifActivity extends AppCompatActivity {
 
   private static final String TAG = "ShareGifActivity";
+
+  private static final String POST_TO_ALBUM = "PostToFacebookAlbum";
 
   private static final int REQUEST_CAMERA_PERMISSION = 1;
 
@@ -100,14 +103,30 @@ public class ShareGifActivity extends AppCompatActivity {
       @Override
       public void onClick(View view) {
         mProgress.setVisibility(View.VISIBLE);
-        postToFacebookAlbum.shareGifToFb(ShareGifActivity.this.gifFileAbsolutePath, ShareGifActivity.this, new PostToFacebookAlbum.Listener() {
-          @Override
-          public void onPicturePublished() {
-            Toast.makeText(ShareGifActivity.this, "Your video is shared on Facebook :) Check the page", Toast.LENGTH_LONG).show();
-            mProgress.setVisibility(View.GONE);
-            onBackPressed();
-          }
-        });
+        postToFacebookAlbum.shareGifToFb(ShareGifActivity.this.gifFileAbsolutePath,
+            new FacebookCallback<Sharer.Result>() {
+              @Override
+              public void onSuccess(Sharer.Result result) {
+                Log.d(POST_TO_ALBUM, "posting succeeded: " + result.getPostId());
+                Toast.makeText(ShareGifActivity.this, "Your video is shared on Facebook :) Check the page", Toast.LENGTH_LONG).show();
+                mProgress.setVisibility(View.GONE);
+                onBackPressed();
+              }
+
+              @Override
+              public void onCancel() {
+                Log.w(POST_TO_ALBUM, "posting cancelled");
+                Toast.makeText(ShareGifActivity.this, "Video upload did not work :(", Toast.LENGTH_LONG).show();
+                mProgress.setVisibility(View.GONE);
+              }
+
+              @Override
+              public void onError(FacebookException error) {
+                Log.w(POST_TO_ALBUM, error.getMessage());
+                Toast.makeText(ShareGifActivity.this, "Video upload did not work :(", Toast.LENGTH_LONG).show();
+                mProgress.setVisibility(View.GONE);
+              }
+            });
       }
     });
     mBackToCamera.setOnClickListener(new View.OnClickListener() {
