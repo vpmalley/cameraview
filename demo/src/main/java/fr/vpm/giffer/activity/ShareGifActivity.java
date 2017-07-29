@@ -141,6 +141,7 @@ public class ShareGifActivity extends AppCompatActivity {
     callbackManager = CallbackManager.Factory.create();
     LoginButton loginButton = (LoginButton) findViewById(R.id.login_button);
     loginButton.setPublishPermissions("publish_actions");
+//    loginButton.setReadPermissions("user_managed_groups");
     loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
       @Override
       public void onSuccess(LoginResult loginResult) {

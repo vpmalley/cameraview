@@ -28,7 +28,7 @@ public class GetFacebookAlbums {
     Log.d(GET_FACEBOOK_ALBUMS, "querying albums");
     new GraphRequest(
         AccessToken.getCurrentAccessToken(),
-        "/" + AccessToken.getCurrentAccessToken().getUserId() + "/albums", // "/accounts" for pages
+        "/" + AccessToken.getCurrentAccessToken().getUserId() + "/groups", // "/accounts" for pages, "/groups"
         null,
         HttpMethod.GET,
         new GraphRequest.Callback() {
@@ -36,14 +36,16 @@ public class GetFacebookAlbums {
             Log.d(GET_FACEBOOK_ALBUMS, "got a response : " + response.toString());
             /* handle the result */
             List<String> albumIds = new ArrayList<String>();
-            try {
-              JSONArray albums = response.getJSONObject().getJSONArray("data");
-              Log.d(GET_FACEBOOK_ALBUMS, albums.toString());
-              for (int i = 0; i < albums.length(); i++) {
-                albumIds.add(albums.getJSONObject(i).getString("id"));
+            if (response.getError() == null || response.getError().getRequestStatusCode() != 400) {
+              try {
+                JSONArray albums = response.getJSONObject().getJSONArray("data");
+                Log.d(GET_FACEBOOK_ALBUMS, albums.toString());
+                for (int i = 0; i < albums.length(); i++) {
+                  albumIds.add(albums.getJSONObject(i).getString("id"));
+                }
+              } catch (JSONException e) {
+                Log.w(GET_FACEBOOK_ALBUMS, "cannot get my albums");
               }
-            } catch (JSONException e) {
-              Log.w(GET_FACEBOOK_ALBUMS, "cannot get my albums");
             }
           }
         }

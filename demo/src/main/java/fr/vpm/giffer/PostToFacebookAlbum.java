@@ -16,7 +16,7 @@ public class PostToFacebookAlbum {
   private static final String POST_TO_ALBUM = "PostToFacebookAlbum";
 
   public void shareGifToFb(String gifFileAbsolutePath, FacebookCallback<Sharer.Result> callback) {
-    Log.w(POST_TO_ALBUM, "sharing gif to fb");
+    Log.d(POST_TO_ALBUM, "sharing gif to fb");
 
     Uri uri = Uri.fromFile(new File(gifFileAbsolutePath));
     ShareVideo shareVideo = new ShareVideo.Builder()
@@ -25,14 +25,15 @@ public class PostToFacebookAlbum {
 
     ShareVideoContent shareVideoContent= new ShareVideoContent.Builder()
         .setVideo(shareVideo)
-        .setContentTitle("giffing")
+        .setContentTitle("5 août selfie")
         .build();
 
     ShareApi shareApi = new ShareApi(shareVideoContent);
     //shareApi.setGraphNode("10211351342553032"); // album
     //shareApi.setGraphNode("1475683019176601"); // page
-    shareApi.setGraphNode("118036015501050"); // group
+    shareApi.setGraphNode("1472278586199579"); // group
     shareApi.setMessage("Another Gif");
+    Log.d(POST_TO_ALBUM, "can share video to group : " + shareApi.canShare());
     shareApi.share(callback);
   }
 }
